@@ -1,0 +1,625 @@
+Node 0: X: 10.5, Y: 14.4, Value: 0.0
+  -> Connected to Node 1 with distance 0.76
+  -> Connected to Node 2 with distance 7.65
+  -> Connected to Node 3 with distance 7.88
+  -> Connected to Node 4 with distance 7.87
+  -> Connected to Node 5 with distance 5.96
+  -> Connected to Node 6 with distance 4.56
+  -> Connected to Node 7 with distance 5.90
+  -> Connected to Node 8 with distance 6.81
+  -> Connected to Node 9 with distance 5.70
+  -> Connected to Node 10 with distance 7.64
+  -> Connected to Node 12 with distance 6.31
+  -> Connected to Node 13 with distance 3.91
+  -> Connected to Node 15 with distance 7.75
+  -> Connected to Node 17 with distance 5.28
+  -> Connected to Node 18 with distance 2.56
+  -> Connected to Node 19 with distance 3.28
+  -> Connected to Node 20 with distance 4.32
+  -> Connected to Node 21 with distance 6.02
+  -> Connected to Node 22 with distance 7.71
+  -> Connected to Node 26 with distance 5.96
+  -> Connected to Node 27 with distance 3.76
+  -> Connected to Node 28 with distance 1.79
+  -> Connected to Node 29 with distance 5.91
+  -> Connected to Node 30 with distance 7.18
+  -> Connected to Node 31 with distance 5.44
+
+Problem with budget 40.0
+Node 1: X: 11.2, Y: 14.1, Value: 0.0
+  -> Connected to Node 0 with distance 0.76
+  -> Connected to Node 2 with distance 7.03
+  -> Connected to Node 3 with distance 7.14
+  -> Connected to Node 4 with distance 7.15
+  -> Connected to Node 5 with distance 5.22
+  -> Connected to Node 6 with distance 3.81
+  -> Connected to Node 7 with distance 5.16
+  -> Connected to Node 8 with distance 6.38
+  -> Connected to Node 9 with distance 5.37
+  -> Connected to Node 10 with distance 7.37
+  -> Connected to Node 11 with distance 7.91
+  -> Connected to Node 12 with distance 6.32
+  -> Connected to Node 13 with distance 3.32
+  -> Connected to Node 15 with distance 7.40
+  -> Connected to Node 17 with distance 5.42
+  -> Connected to Node 18 with distance 2.11
+  -> Connected to Node 19 with distance 3.50
+  -> Connected to Node 20 with distance 4.73
+  -> Connected to Node 21 with distance 6.22
+  -> Connected to Node 26 with distance 6.53
+  -> Connected to Node 27 with distance 4.38
+  -> Connected to Node 28 with distance 2.35
+  -> Connected to Node 29 with distance 6.35
+  -> Connected to Node 30 with distance 7.92
+  -> Connected to Node 31 with distance 6.11
+
+Problem with budget 40.0
+Node 2: X: 18.0, Y: 15.9, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 7.65
+  -> Connected to Node 1 with distance 7.03
+  -> Connected to Node 3 with distance 2.62
+  -> Connected to Node 4 with distance 6.77
+  -> Connected to Node 5 with distance 5.55
+  -> Connected to Node 6 with distance 4.11
+  -> Connected to Node 7 with distance 3.11
+  -> Connected to Node 8 with distance 2.48
+  -> Connected to Node 9 with distance 3.61
+  -> Connected to Node 10 with distance 4.16
+  -> Connected to Node 11 with distance 5.23
+  -> Connected to Node 12 with distance 6.38
+  -> Connected to Node 13 with distance 3.75
+  -> Connected to Node 18 with distance 7.67
+  -> Connected to Node 19 with distance 7.01
+  -> Connected to Node 21 with distance 7.68
+
+Problem with budget 40.0
+Node 3: X: 18.3, Y: 13.3, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 7.88
+  -> Connected to Node 1 with distance 7.14
+  -> Connected to Node 2 with distance 2.62
+  -> Connected to Node 4 with distance 4.39
+  -> Connected to Node 5 with distance 3.70
+  -> Connected to Node 6 with distance 3.40
+  -> Connected to Node 7 with distance 2.00
+  -> Connected to Node 8 with distance 4.88
+  -> Connected to Node 9 with distance 5.66
+  -> Connected to Node 10 with distance 6.67
+  -> Connected to Node 11 with distance 7.75
+  -> Connected to Node 13 with distance 4.47
+  -> Connected to Node 18 with distance 7.02
+
+Problem with budget 40.0
+Node 4: X: 16.5, Y: 9.3, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 7.87
+  -> Connected to Node 1 with distance 7.15
+  -> Connected to Node 2 with distance 6.77
+  -> Connected to Node 3 with distance 4.39
+  -> Connected to Node 5 with distance 2.02
+  -> Connected to Node 6 with distance 4.22
+  -> Connected to Node 7 with distance 4.00
+  -> Connected to Node 13 with distance 6.39
+  -> Connected to Node 14 with distance 4.89
+  -> Connected to Node 15 with distance 5.72
+  -> Connected to Node 18 with distance 5.77
+
+Problem with budget 40.0
+Node 5: X: 15.4, Y: 11.0, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 5.96
+  -> Connected to Node 1 with distance 5.22
+  -> Connected to Node 2 with distance 5.55
+  -> Connected to Node 3 with distance 3.70
+  -> Connected to Node 4 with distance 2.02
+  -> Connected to Node 6 with distance 2.26
+  -> Connected to Node 7 with distance 2.47
+  -> Connected to Node 8 with distance 6.87
+  -> Connected to Node 9 with distance 6.91
+  -> Connected to Node 13 with distance 4.44
+  -> Connected to Node 14 with distance 6.06
+  -> Connected to Node 15 with distance 5.87
+  -> Connected to Node 17 with distance 7.60
+  -> Connected to Node 18 with distance 4.12
+  -> Connected to Node 19 with distance 7.82
+  -> Connected to Node 28 with distance 7.00
+
+Problem with budget 40.0
+Node 6: X: 14.9, Y: 13.2, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 4.56
+  -> Connected to Node 1 with distance 3.81
+  -> Connected to Node 2 with distance 4.11
+  -> Connected to Node 3 with distance 3.40
+  -> Connected to Node 4 with distance 4.22
+  -> Connected to Node 5 with distance 2.26
+  -> Connected to Node 7 with distance 1.40
+  -> Connected to Node 8 with distance 4.84
+  -> Connected to Node 9 with distance 4.70
+  -> Connected to Node 10 with distance 6.51
+  -> Connected to Node 11 with distance 7.44
+  -> Connected to Node 12 with distance 7.11
+  -> Connected to Node 13 with distance 2.18
+  -> Connected to Node 15 with distance 7.38
+  -> Connected to Node 17 with distance 7.78
+  -> Connected to Node 18 with distance 3.70
+  -> Connected to Node 19 with distance 5.75
+  -> Connected to Node 20 with distance 7.30
+  -> Connected to Node 21 with distance 7.79
+  -> Connected to Node 27 with distance 7.66
+  -> Connected to Node 28 with distance 6.01
+
+Problem with budget 40.0
+Node 7: X: 16.3, Y: 13.3, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 5.90
+  -> Connected to Node 1 with distance 5.16
+  -> Connected to Node 2 with distance 3.11
+  -> Connected to Node 3 with distance 2.00
+  -> Connected to Node 4 with distance 4.00
+  -> Connected to Node 5 with distance 2.47
+  -> Connected to Node 6 with distance 1.40
+  -> Connected to Node 8 with distance 4.50
+  -> Connected to Node 9 with distance 4.78
+  -> Connected to Node 10 with distance 6.30
+  -> Connected to Node 11 with distance 7.32
+  -> Connected to Node 12 with distance 7.47
+  -> Connected to Node 13 with distance 2.83
+  -> Connected to Node 18 with distance 5.07
+  -> Connected to Node 19 with distance 6.67
+  -> Connected to Node 28 with distance 7.41
+
+Problem with budget 40.0
+Node 8: X: 16.4, Y: 17.8, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 6.81
+  -> Connected to Node 1 with distance 6.38
+  -> Connected to Node 2 with distance 2.48
+  -> Connected to Node 3 with distance 4.88
+  -> Connected to Node 5 with distance 6.87
+  -> Connected to Node 6 with distance 4.84
+  -> Connected to Node 7 with distance 4.50
+  -> Connected to Node 9 with distance 1.40
+  -> Connected to Node 10 with distance 1.82
+  -> Connected to Node 11 with distance 2.89
+  -> Connected to Node 12 with distance 3.94
+  -> Connected to Node 13 with distance 3.26
+  -> Connected to Node 18 with distance 7.66
+  -> Connected to Node 19 with distance 5.20
+  -> Connected to Node 20 with distance 6.36
+  -> Connected to Node 21 with distance 5.32
+  -> Connected to Node 22 with distance 7.55
+  -> Connected to Node 27 with distance 7.70
+
+Problem with budget 40.0
+Node 9: X: 15.0, Y: 17.9, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 5.70
+  -> Connected to Node 1 with distance 5.37
+  -> Connected to Node 2 with distance 3.61
+  -> Connected to Node 3 with distance 5.66
+  -> Connected to Node 5 with distance 6.91
+  -> Connected to Node 6 with distance 4.70
+  -> Connected to Node 7 with distance 4.78
+  -> Connected to Node 8 with distance 1.40
+  -> Connected to Node 10 with distance 2.02
+  -> Connected to Node 11 with distance 2.79
+  -> Connected to Node 12 with distance 2.84
+  -> Connected to Node 13 with distance 2.69
+  -> Connected to Node 18 with distance 6.91
+  -> Connected to Node 19 with distance 3.81
+  -> Connected to Node 20 with distance 4.96
+  -> Connected to Node 21 with distance 4.08
+  -> Connected to Node 22 with distance 6.38
+  -> Connected to Node 23 with distance 7.93
+  -> Connected to Node 26 with distance 7.09
+  -> Connected to Node 27 with distance 6.30
+  -> Connected to Node 28 with distance 7.46
+  -> Connected to Node 31 with distance 7.75
+
+Problem with budget 40.0
+Node 10: X: 16.1, Y: 19.6, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 7.64
+  -> Connected to Node 1 with distance 7.37
+  -> Connected to Node 2 with distance 4.16
+  -> Connected to Node 3 with distance 6.67
+  -> Connected to Node 6 with distance 6.51
+  -> Connected to Node 7 with distance 6.30
+  -> Connected to Node 8 with distance 1.82
+  -> Connected to Node 9 with distance 2.02
+  -> Connected to Node 11 with distance 1.08
+  -> Connected to Node 12 with distance 2.94
+  -> Connected to Node 13 with distance 4.66
+  -> Connected to Node 19 with distance 5.29
+  -> Connected to Node 20 with distance 6.07
+  -> Connected to Node 21 with distance 4.46
+  -> Connected to Node 22 with distance 6.41
+  -> Connected to Node 23 with distance 7.66
+  -> Connected to Node 26 with distance 7.91
+  -> Connected to Node 27 with distance 7.64
+
+Problem with budget 40.0
+Node 11: X: 15.7, Y: 20.6, Value: 0.03508771929824561
+  -> Connected to Node 1 with distance 7.91
+  -> Connected to Node 2 with distance 5.23
+  -> Connected to Node 3 with distance 7.75
+  -> Connected to Node 6 with distance 7.44
+  -> Connected to Node 7 with distance 7.32
+  -> Connected to Node 8 with distance 2.89
+  -> Connected to Node 9 with distance 2.79
+  -> Connected to Node 10 with distance 1.08
+  -> Connected to Node 12 with distance 2.55
+  -> Connected to Node 13 with distance 5.48
+  -> Connected to Node 19 with distance 5.41
+  -> Connected to Node 20 with distance 5.91
+  -> Connected to Node 21 with distance 4.01
+  -> Connected to Node 22 with distance 5.70
+  -> Connected to Node 23 with distance 6.80
+  -> Connected to Node 26 with distance 7.53
+  -> Connected to Node 27 with distance 7.58
+
+Problem with budget 40.0
+Node 12: X: 13.2, Y: 20.1, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 6.31
+  -> Connected to Node 1 with distance 6.32
+  -> Connected to Node 2 with distance 6.38
+  -> Connected to Node 6 with distance 7.11
+  -> Connected to Node 7 with distance 7.47
+  -> Connected to Node 8 with distance 3.94
+  -> Connected to Node 9 with distance 2.84
+  -> Connected to Node 10 with distance 2.94
+  -> Connected to Node 11 with distance 2.55
+  -> Connected to Node 13 with distance 4.92
+  -> Connected to Node 19 with distance 3.20
+  -> Connected to Node 20 with distance 3.40
+  -> Connected to Node 21 with distance 1.51
+  -> Connected to Node 22 with distance 3.61
+  -> Connected to Node 23 with distance 5.09
+  -> Connected to Node 24 with distance 7.02
+  -> Connected to Node 25 with distance 6.99
+  -> Connected to Node 26 with distance 5.00
+  -> Connected to Node 27 with distance 5.10
+  -> Connected to Node 28 with distance 7.79
+  -> Connected to Node 31 with distance 6.04
+
+Problem with budget 40.0
+Node 13: X: 14.3, Y: 15.3, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 3.91
+  -> Connected to Node 1 with distance 3.32
+  -> Connected to Node 2 with distance 3.75
+  -> Connected to Node 3 with distance 4.47
+  -> Connected to Node 4 with distance 6.39
+  -> Connected to Node 5 with distance 4.44
+  -> Connected to Node 6 with distance 2.18
+  -> Connected to Node 7 with distance 2.83
+  -> Connected to Node 8 with distance 3.26
+  -> Connected to Node 9 with distance 2.69
+  -> Connected to Node 10 with distance 4.66
+  -> Connected to Node 11 with distance 5.48
+  -> Connected to Node 12 with distance 4.92
+  -> Connected to Node 18 with distance 4.39
+  -> Connected to Node 19 with distance 3.86
+  -> Connected to Node 20 with distance 5.40
+  -> Connected to Node 21 with distance 5.64
+  -> Connected to Node 22 with distance 7.94
+  -> Connected to Node 26 with distance 7.64
+  -> Connected to Node 27 with distance 6.09
+  -> Connected to Node 28 with distance 5.66
+  -> Connected to Node 31 with distance 7.83
+
+Problem with budget 40.0
+Node 14: X: 14.0, Y: 5.1, Value: 0.03508771929824561
+  -> Connected to Node 4 with distance 4.89
+  -> Connected to Node 5 with distance 6.06
+  -> Connected to Node 15 with distance 3.05
+  -> Connected to Node 16 with distance 5.70
+  -> Connected to Node 17 with distance 7.70
+  -> Connected to Node 18 with distance 7.37
+
+Problem with budget 40.0
+Node 15: X: 11.4, Y: 6.7, Value: 0.05263157894736842
+  -> Connected to Node 0 with distance 7.75
+  -> Connected to Node 1 with distance 7.40
+  -> Connected to Node 4 with distance 5.72
+  -> Connected to Node 5 with distance 5.87
+  -> Connected to Node 6 with distance 7.38
+  -> Connected to Node 14 with distance 3.05
+  -> Connected to Node 16 with distance 3.54
+  -> Connected to Node 17 with distance 4.68
+  -> Connected to Node 18 with distance 5.30
+  -> Connected to Node 28 with distance 7.34
+  -> Connected to Node 29 with distance 7.28
+
+Problem with budget 40.0
+Node 16: X: 8.3, Y: 5.0, Value: 0.05263157894736842
+  -> Connected to Node 14 with distance 5.70
+  -> Connected to Node 15 with distance 3.54
+  -> Connected to Node 17 with distance 4.82
+  -> Connected to Node 18 with distance 7.66
+  -> Connected to Node 29 with distance 6.67
+
+Problem with budget 40.0
+Node 17: X: 7.9, Y: 9.8, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 5.28
+  -> Connected to Node 1 with distance 5.42
+  -> Connected to Node 5 with distance 7.60
+  -> Connected to Node 6 with distance 7.78
+  -> Connected to Node 14 with distance 7.70
+  -> Connected to Node 15 with distance 4.68
+  -> Connected to Node 16 with distance 4.82
+  -> Connected to Node 18 with distance 4.13
+  -> Connected to Node 27 with distance 7.94
+  -> Connected to Node 28 with distance 3.93
+  -> Connected to Node 29 with distance 2.64
+
+Problem with budget 40.0
+Node 18: X: 11.4, Y: 12.0, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 2.56
+  -> Connected to Node 1 with distance 2.11
+  -> Connected to Node 2 with distance 7.67
+  -> Connected to Node 3 with distance 7.02
+  -> Connected to Node 4 with distance 5.77
+  -> Connected to Node 5 with distance 4.12
+  -> Connected to Node 6 with distance 3.70
+  -> Connected to Node 7 with distance 5.07
+  -> Connected to Node 8 with distance 7.66
+  -> Connected to Node 9 with distance 6.91
+  -> Connected to Node 13 with distance 4.39
+  -> Connected to Node 14 with distance 7.37
+  -> Connected to Node 15 with distance 5.30
+  -> Connected to Node 16 with distance 7.66
+  -> Connected to Node 17 with distance 4.13
+  -> Connected to Node 19 with distance 5.60
+  -> Connected to Node 20 with distance 6.82
+  -> Connected to Node 27 with distance 6.31
+  -> Connected to Node 28 with distance 2.97
+  -> Connected to Node 29 with distance 5.87
+  -> Connected to Node 31 with distance 7.94
+
+Problem with budget 40.0
+Node 19: X: 11.2, Y: 17.6, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 3.28
+  -> Connected to Node 1 with distance 3.50
+  -> Connected to Node 2 with distance 7.01
+  -> Connected to Node 5 with distance 7.82
+  -> Connected to Node 6 with distance 5.75
+  -> Connected to Node 7 with distance 6.67
+  -> Connected to Node 8 with distance 5.20
+  -> Connected to Node 9 with distance 3.81
+  -> Connected to Node 10 with distance 5.29
+  -> Connected to Node 11 with distance 5.41
+  -> Connected to Node 12 with distance 3.20
+  -> Connected to Node 13 with distance 3.86
+  -> Connected to Node 18 with distance 5.60
+  -> Connected to Node 20 with distance 1.56
+  -> Connected to Node 21 with distance 2.75
+  -> Connected to Node 22 with distance 4.61
+  -> Connected to Node 23 with distance 6.38
+  -> Connected to Node 25 with distance 7.44
+  -> Connected to Node 26 with distance 3.78
+  -> Connected to Node 27 with distance 2.50
+  -> Connected to Node 28 with distance 4.61
+  -> Connected to Node 30 with distance 6.43
+  -> Connected to Node 31 with distance 4.08
+
+Problem with budget 40.0
+Node 20: X: 10.1, Y: 18.7, Value: 0.017543859649122806
+  -> Connected to Node 0 with distance 4.32
+  -> Connected to Node 1 with distance 4.73
+  -> Connected to Node 6 with distance 7.30
+  -> Connected to Node 8 with distance 6.36
+  -> Connected to Node 9 with distance 4.96
+  -> Connected to Node 10 with distance 6.07
+  -> Connected to Node 11 with distance 5.91
+  -> Connected to Node 12 with distance 3.40
+  -> Connected to Node 13 with distance 5.40
+  -> Connected to Node 18 with distance 6.82
+  -> Connected to Node 19 with distance 1.56
+  -> Connected to Node 21 with distance 2.26
+  -> Connected to Node 22 with distance 3.40
+  -> Connected to Node 23 with distance 5.12
+  -> Connected to Node 24 with distance 7.70
+  -> Connected to Node 25 with distance 5.95
+  -> Connected to Node 26 with distance 2.25
+  -> Connected to Node 27 with distance 1.72
+  -> Connected to Node 28 with distance 5.24
+  -> Connected to Node 30 with distance 5.20
+  -> Connected to Node 31 with distance 2.80
+
+Problem with budget 40.0
+Node 21: X: 11.7, Y: 20.3, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 6.02
+  -> Connected to Node 1 with distance 6.22
+  -> Connected to Node 2 with distance 7.68
+  -> Connected to Node 6 with distance 7.79
+  -> Connected to Node 8 with distance 5.32
+  -> Connected to Node 9 with distance 4.08
+  -> Connected to Node 10 with distance 4.46
+  -> Connected to Node 11 with distance 4.01
+  -> Connected to Node 12 with distance 1.51
+  -> Connected to Node 13 with distance 5.64
+  -> Connected to Node 19 with distance 2.75
+  -> Connected to Node 20 with distance 2.26
+  -> Connected to Node 22 with distance 2.34
+  -> Connected to Node 23 with distance 4.03
+  -> Connected to Node 24 with distance 6.31
+  -> Connected to Node 25 with distance 5.67
+  -> Connected to Node 26 with distance 3.52
+  -> Connected to Node 27 with distance 3.97
+  -> Connected to Node 28 with distance 7.26
+  -> Connected to Node 30 with distance 6.94
+  -> Connected to Node 31 with distance 4.65
+
+Problem with budget 40.0
+Node 22: X: 10.2, Y: 22.1, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 7.71
+  -> Connected to Node 8 with distance 7.55
+  -> Connected to Node 9 with distance 6.38
+  -> Connected to Node 10 with distance 6.41
+  -> Connected to Node 11 with distance 5.70
+  -> Connected to Node 12 with distance 3.61
+  -> Connected to Node 13 with distance 7.94
+  -> Connected to Node 19 with distance 4.61
+  -> Connected to Node 20 with distance 3.40
+  -> Connected to Node 21 with distance 2.34
+  -> Connected to Node 23 with distance 1.77
+  -> Connected to Node 24 with distance 4.30
+  -> Connected to Node 25 with distance 3.38
+  -> Connected to Node 26 with distance 2.97
+  -> Connected to Node 27 with distance 4.65
+  -> Connected to Node 30 with distance 6.19
+  -> Connected to Node 31 with distance 4.39
+
+Problem with budget 40.0
+Node 23: X: 9.7, Y: 23.8, Value: 0.03508771929824561
+  -> Connected to Node 9 with distance 7.93
+  -> Connected to Node 10 with distance 7.66
+  -> Connected to Node 11 with distance 6.80
+  -> Connected to Node 12 with distance 5.09
+  -> Connected to Node 19 with distance 6.38
+  -> Connected to Node 20 with distance 5.12
+  -> Connected to Node 21 with distance 4.03
+  -> Connected to Node 22 with distance 1.77
+  -> Connected to Node 24 with distance 2.63
+  -> Connected to Node 25 with distance 2.31
+  -> Connected to Node 26 with distance 4.18
+  -> Connected to Node 27 with distance 6.18
+  -> Connected to Node 30 with distance 6.86
+  -> Connected to Node 31 with distance 5.55
+
+Problem with budget 40.0
+Node 24: X: 10.1, Y: 26.4, Value: 0.05263157894736842
+  -> Connected to Node 12 with distance 7.02
+  -> Connected to Node 20 with distance 7.70
+  -> Connected to Node 21 with distance 6.31
+  -> Connected to Node 22 with distance 4.30
+  -> Connected to Node 23 with distance 2.63
+  -> Connected to Node 25 with distance 3.61
+  -> Connected to Node 26 with distance 6.77
+
+Problem with budget 40.0
+Node 25: X: 7.4, Y: 24.0, Value: 0.05263157894736842
+  -> Connected to Node 12 with distance 6.99
+  -> Connected to Node 19 with distance 7.44
+  -> Connected to Node 20 with distance 5.95
+  -> Connected to Node 21 with distance 5.67
+  -> Connected to Node 22 with distance 3.38
+  -> Connected to Node 23 with distance 2.31
+  -> Connected to Node 24 with distance 3.61
+  -> Connected to Node 26 with distance 4.18
+  -> Connected to Node 27 with distance 6.43
+  -> Connected to Node 30 with distance 5.68
+  -> Connected to Node 31 with distance 5.20
+
+Problem with budget 40.0
+Node 26: X: 8.2, Y: 19.9, Value: 0.05263157894736842
+  -> Connected to Node 0 with distance 5.96
+  -> Connected to Node 1 with distance 6.53
+  -> Connected to Node 9 with distance 7.09
+  -> Connected to Node 10 with distance 7.91
+  -> Connected to Node 11 with distance 7.53
+  -> Connected to Node 12 with distance 5.00
+  -> Connected to Node 13 with distance 7.64
+  -> Connected to Node 19 with distance 3.78
+  -> Connected to Node 20 with distance 2.25
+  -> Connected to Node 21 with distance 3.52
+  -> Connected to Node 22 with distance 2.97
+  -> Connected to Node 23 with distance 4.18
+  -> Connected to Node 24 with distance 6.77
+  -> Connected to Node 25 with distance 4.18
+  -> Connected to Node 27 with distance 2.26
+  -> Connected to Node 28 with distance 6.34
+  -> Connected to Node 30 with distance 3.45
+  -> Connected to Node 31 with distance 1.42
+
+Problem with budget 40.0
+Node 27: X: 8.7, Y: 17.7, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 3.76
+  -> Connected to Node 1 with distance 4.38
+  -> Connected to Node 6 with distance 7.66
+  -> Connected to Node 8 with distance 7.70
+  -> Connected to Node 9 with distance 6.30
+  -> Connected to Node 10 with distance 7.64
+  -> Connected to Node 11 with distance 7.58
+  -> Connected to Node 12 with distance 5.10
+  -> Connected to Node 13 with distance 6.09
+  -> Connected to Node 17 with distance 7.94
+  -> Connected to Node 18 with distance 6.31
+  -> Connected to Node 19 with distance 2.50
+  -> Connected to Node 20 with distance 1.72
+  -> Connected to Node 21 with distance 3.97
+  -> Connected to Node 22 with distance 4.65
+  -> Connected to Node 23 with distance 6.18
+  -> Connected to Node 25 with distance 6.43
+  -> Connected to Node 26 with distance 2.26
+  -> Connected to Node 28 with distance 4.10
+  -> Connected to Node 29 with distance 7.29
+  -> Connected to Node 30 with distance 3.98
+  -> Connected to Node 31 with distance 1.78
+
+Problem with budget 40.0
+Node 28: X: 8.9, Y: 13.6, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 1.79
+  -> Connected to Node 1 with distance 2.35
+  -> Connected to Node 5 with distance 7.00
+  -> Connected to Node 6 with distance 6.01
+  -> Connected to Node 7 with distance 7.41
+  -> Connected to Node 9 with distance 7.46
+  -> Connected to Node 12 with distance 7.79
+  -> Connected to Node 13 with distance 5.66
+  -> Connected to Node 15 with distance 7.34
+  -> Connected to Node 17 with distance 3.93
+  -> Connected to Node 18 with distance 2.97
+  -> Connected to Node 19 with distance 4.61
+  -> Connected to Node 20 with distance 5.24
+  -> Connected to Node 21 with distance 7.26
+  -> Connected to Node 26 with distance 6.34
+  -> Connected to Node 27 with distance 4.10
+  -> Connected to Node 29 with distance 4.14
+  -> Connected to Node 30 with distance 6.64
+  -> Connected to Node 31 with distance 5.44
+
+Problem with budget 40.0
+Node 29: X: 5.6, Y: 11.1, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 5.91
+  -> Connected to Node 1 with distance 6.35
+  -> Connected to Node 15 with distance 7.28
+  -> Connected to Node 16 with distance 6.67
+  -> Connected to Node 17 with distance 2.64
+  -> Connected to Node 18 with distance 5.87
+  -> Connected to Node 27 with distance 7.29
+  -> Connected to Node 28 with distance 4.14
+  -> Connected to Node 30 with distance 7.83
+  -> Connected to Node 31 with distance 7.89
+
+Problem with budget 40.0
+Node 30: X: 4.9, Y: 18.9, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 7.18
+  -> Connected to Node 1 with distance 7.92
+  -> Connected to Node 19 with distance 6.43
+  -> Connected to Node 20 with distance 5.20
+  -> Connected to Node 21 with distance 6.94
+  -> Connected to Node 22 with distance 6.19
+  -> Connected to Node 23 with distance 6.86
+  -> Connected to Node 25 with distance 5.68
+  -> Connected to Node 26 with distance 3.45
+  -> Connected to Node 27 with distance 3.98
+  -> Connected to Node 28 with distance 6.64
+  -> Connected to Node 29 with distance 7.83
+  -> Connected to Node 31 with distance 2.40
+
+Problem with budget 40.0
+Node 31: X: 7.3, Y: 18.8, Value: 0.03508771929824561
+  -> Connected to Node 0 with distance 5.44
+  -> Connected to Node 1 with distance 6.11
+  -> Connected to Node 9 with distance 7.75
+  -> Connected to Node 12 with distance 6.04
+  -> Connected to Node 13 with distance 7.83
+  -> Connected to Node 18 with distance 7.94
+  -> Connected to Node 19 with distance 4.08
+  -> Connected to Node 20 with distance 2.80
+  -> Connected to Node 21 with distance 4.65
+  -> Connected to Node 22 with distance 4.39
+  -> Connected to Node 23 with distance 5.55
+  -> Connected to Node 25 with distance 5.20
+  -> Connected to Node 26 with distance 1.42
+  -> Connected to Node 27 with distance 1.78
+  -> Connected to Node 28 with distance 5.44
+  -> Connected to Node 29 with distance 7.89
+  -> Connected to Node 30 with distance 2.40
+
+Problem with budget 40.0
+Average distance between nodes: 5.2306885484694305

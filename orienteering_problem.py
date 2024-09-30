@@ -67,10 +67,29 @@ class OrienteeringGraph:
                 print(f"  -> Connected to Node {neighbour_index} with distance {distance:.2f}")
             print()  # Add an empty line for better readability
             print(f"Problem with budget {self.budget}")
+
+    def calculate_average_distance(self):
+        total_distance = 0
+        count = 0
+        visited_pairs = set()  # To avoid double-counting
+        
+        for node_a in self.get_nodes():
+            for node_b, distance in self.get_neighbours(node_a).items():
+                # Create a pair of nodes and make sure it's counted only once
+                pair = tuple(sorted((node_a, node_b)))
+                if pair not in visited_pairs:
+                    visited_pairs.add(pair)
+                    total_distance += distance
+                    count += 1
+        
+        # Calculate average distance
+        if count == 0:
+            return 0  # Avoid division by zero if there are no edges
+        average_distance = total_distance / count
+        return average_distance
    
 def calculate_euclidian_distance(x1, y1, x2, y2):
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
 
 # if __name__ == "__main__":
 #     graph = OrienteeringGraph(0)

@@ -5,10 +5,15 @@ class MCTSNode:
         self.parent = parent
         self.visits = 0
         self.children = []
+        self.possible_children = []
         self.path = path if path is not None else [op_node_index]
         self.value = sum(graph.get_node(op_node).value for op_node in self.path)
+        # self.value = 0
         self.is_root = is_root  # New flag for root node
     
+    def add_possible_child(self, possible_child_node):
+        self.possible_children.append(possible_child_node)
+
     def add_child(self, child_node):
         self.children.append(child_node)
 
