@@ -8,7 +8,7 @@ SET_66_MAXIMUM_REWARD = 1300
 def main():
     # Initialise orienteering graph and add nodes to the graph
     orienteering_graph = OrienteeringGraph(budget=0)
-    file = "tsiligirides_1/tsiligirides_problem_1_budget_40.txt"
+    file = "tsiligirides_1/tsiligirides_problem_1_budget_80.txt"
     if "tsiligirides" in file:
         maximum_reward = TSILIGIRIRIDES_1_MAXIMUM_REWARD
     elif "set_66" in file:
