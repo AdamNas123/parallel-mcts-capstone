@@ -1,5 +1,5 @@
 from orienteering_problem import Node, OrienteeringGraph, calculate_euclidian_distance
-from mcts_v3 import mcts_run
+from mcts import mcts_run
 import time
 
 TSILIGIRIRIDES_1_MAXIMUM_REWARD = 285

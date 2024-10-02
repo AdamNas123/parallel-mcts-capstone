@@ -2,7 +2,7 @@ import math
 import random 
 
 from orienteering_problem import Node, OrienteeringGraph
-from tree_node_v2 import MCTSNode
+from tree_node import MCTSNode
 # from plot import plot_graph, update_plot
 import matplotlib.pyplot as plt
 import networkx as nx
