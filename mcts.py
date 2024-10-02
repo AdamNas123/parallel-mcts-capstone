@@ -1,11 +1,10 @@
 import math
 import random 
 
-from orienteering_problem import Node, OrienteeringGraph
+from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-# from plot import plot_graph, update_plot
-import matplotlib.pyplot as plt
-import networkx as nx
+from plot import setup_plot, update_plot, plot_final_path
+
 
 
 # Add Possible Neighbours (Unexpanded Children) - Used to Select best child node and expand into tree
@@ -44,50 +43,6 @@ import networkx as nx
     
     print(f"Added possible child nodes {new_nodes} to the parent {mcts_node.path}")
 """
-# Plot setup
-def setup_plot(graph: OrienteeringGraph):
-    plt.ion()  # Interactive mode on
-    fig, ax = plt.subplots()
-    G = nx.Graph()
-    
-    # Add nodes to the graph with coordinates
-    for node in graph.get_nodes():
-        G.add_node(node, pos=(graph.graph[node].x, graph.graph[node].y))
-    
-    # Plot nodes with labels
-    pos = nx.get_node_attributes(G, 'pos')
-    nx.draw(G, pos, ax=ax, with_labels=True, node_color='lightblue', node_size=500)
-    print("Setup graph")
-    plt.pause(0.0000001)
-    return fig, ax, G, pos
-
-# Update the plot with newly added edges
-def update_plot(ax, G, pos, parent_idx, child_idx):
-    G.add_edge(parent_idx, child_idx)
-    ax.clear()
-    nx.draw(G, pos, ax=ax, with_labels=True, node_color='lightblue', node_size=500, edge_color='blue')
-    plt.draw()
-    plt.pause(0.0000001)  # Small pause to allow the plot to update
-
-def plot_final_path(ax, G, pos, graph: OrienteeringGraph, path):
-    red_edges = []
-    edge_labels = {}
-
-    for i in range(len(path) - 1):
-        parent_idx = path[i]
-        child_idx = path[i + 1]
-        red_edges.append((parent_idx, child_idx))
-        distance = graph.get_neighbours(parent_idx)[child_idx]
-        edge_labels[(parent_idx, child_idx)] = f"{distance:.1f}"
-
-    # Draw the red edges for the final path
-    nx.draw_networkx_edges(G, pos, edgelist=red_edges, edge_color='red', width=2.0, ax=ax)
-
-    # Draw edge labels for the budget/distance
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red', ax=ax)
-
-    plt.draw()
-    plt.pause(10)
 
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
     current_index = mcts_node.op_node_index
@@ -175,7 +130,7 @@ def collect_visited_leaf_nodes(node):
 
 # Calls all above functions to run the MCTS Search
 def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=2000000):
-    # fig, ax, G, pos = setup_plot(graph)
+    fig, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)
     root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
@@ -196,7 +151,7 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
             print("Selected and expanded possible child node from root", mcts_node.path, "with value:", mcts_node.value)
 
             # Update the plot when a new child node is officially added
-            # update_plot(ax, G, pos, mcts_node.parent.op_node_index, mcts_node.op_node_index)
+            update_plot(ax, G, pos, mcts_node.parent.op_node_index, mcts_node.op_node_index)
         else:
             # If the node has any possible children, select the first possible child.
             while True:
@@ -209,7 +164,7 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
                     print("Selected and expanded possible child node", mcts_node.path, "with value:", mcts_node.value)
 
                     # Update the plot when a new child node is officially added
-                    # update_plot(ax, G, pos, mcts_node.parent.op_node_index, mcts_node.op_node_index)
+                    update_plot(ax, G, pos, mcts_node.parent.op_node_index, mcts_node.op_node_index)
                     break  # Expansion finished, move to simulation
                 # Else, select the child with the best UCB value
                 elif mcts_node.children:
@@ -238,5 +193,5 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
     # Return best leaf node based on value first, then visits
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
-    # plot_final_path(ax, G, pos, graph, best_node.path)
+    plot_final_path(ax, G, pos, graph, best_node.path)
     return best_node
