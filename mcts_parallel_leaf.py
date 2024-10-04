@@ -5,45 +5,9 @@ from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
 from plot import setup_plot, update_plot, plot_final_path
 
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add Possible Neighbours (Unexpanded Children) - Used to Select best child node and expand into tree
-"""def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
-    current_index = mcts_node.op_node_index
-    current_path_distance = mcts_node.get_path_distance(graph)
-    neighbours = graph.get_neighbours(current_index)
-    new_nodes = []
-
-    # Check if it's the root node
-    # if mcts_node.is_root:
-    #     # Add all valid neighbours within budget as children
-    #     for neighbour_index, distance in neighbours.items():
-    #         if (current_path_distance + distance) <= graph.budget and neighbour_index not in mcts_node.path:
-    #             mcts_node.add_possible_child(neighbour_index)
-    #             new_nodes.append(neighbour_index)
-    #     # print(f"Added all possible child nodes {new_nodes} to the root node {mcts_node.path}")
-
-    # else:
-    # Sort neighbours by their value, and only add the top 3 or fewer within the budget
-    valid_neighbours = [(neighbour_index, distance) for neighbour_index, distance in neighbours.items() 
-                        if (current_path_distance + distance) <= graph.budget and neighbour_index not in mcts_node.path]
-    
-    # Sort by the node value-distance ratios in descending order
-    sorted_neighbours = sorted(valid_neighbours, key=lambda x: graph.get_node(x[0]).value / x[1], reverse=True)
-
-    # Add up to 3 neighbours
-    count = 0
-    for neighbour_index, distance in sorted_neighbours:
-        if count < 2:
-            mcts_node.add_possible_child(neighbour_index)
-            new_nodes.append(neighbour_index)
-            count += 1
-        else:
-            break
-    
-    print(f"Added possible child nodes {new_nodes} to the parent {mcts_node.path}")
-"""
-
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
     current_index = mcts_node.op_node_index
     current_path_distance = mcts_node.get_path_distance(graph)
@@ -68,8 +32,28 @@ def ucb1(node, exploration_constant):
     return ucb
 
 
-# Expansion Phase - If selected node is not terminal, expand it by adding child node for each valid action
-# def expand_tree(mcts_node: MCTSNode, graph: OrienteeringGraph):
+# Parallel Simulation
+def parallel_simulations(mcts_node, graph, num_parallel_simulations):
+    """Run multiple simulations in parallel for the given MCTS node."""
+    rewards = []
+
+    # Define the worker function for each simulation
+    def simulation_task():
+        return simulate_epsilon(graph, mcts_node)
+    
+    with ThreadPoolExecutor(max_workers=num_parallel_simulations) as executor:
+        # Submit the tasks
+        # print("Submitting parallel simulation tasks")
+        futures = [executor.submit(simulation_task) for _ in range(num_parallel_simulations)]
+        
+        # Collect the results as they complete
+        for future in as_completed(futures):
+            rewards.append(future.result())
+    
+    # Aggregate the rewards (e.g., using an average)
+    aggregated_reward = sum(rewards) / len(rewards)
+    
+    return aggregated_reward
     
 
 
@@ -82,7 +66,6 @@ def simulate(graph: OrienteeringGraph, mcts_node: MCTSNode):
     path = mcts_node.path[:]
 
     while remaining_budget > 0:
-        # Should this neighbours be the MCTS nodes child instead of graph neighbours
         neighbours = {k: v for k, v in graph.get_neighbours(current_index).items() if k not in visited}
         if not neighbours:
             break
@@ -91,7 +74,7 @@ def simulate(graph: OrienteeringGraph, mcts_node: MCTSNode):
         # next_node = max(neighbours.keys(), key=lambda n: graph.get_node(n).value / neighbours[n]) #Divide by distance
         # distance = neighbours[next_node]
 
-        # OR randomly choose next neighbour from unvisited neighbours 
+        # OR uncomment below lines to RANDOMLY choose next neighbour from unvisited neighbours 
         next_node = random.choice(list(neighbours.keys()))
         distance = neighbours[next_node]
 
@@ -103,9 +86,39 @@ def simulate(graph: OrienteeringGraph, mcts_node: MCTSNode):
         total_reward += graph.get_node(current_index).value
         visited.add(current_index)
         path.append(current_index)
-    # print(f"Simulated Path: {path}, Reward: {total_reward}, Remaining Budget: {remaining_budget}")
+    print(f"Simulated Path: {path}, Reward: {total_reward}, Remaining Budget: {remaining_budget}")
     return total_reward
 
+# Simulate with Epsilon-Greedy Approach
+def simulate_epsilon(graph: OrienteeringGraph, mcts_node: MCTSNode, epsilon=0.3):
+    current_index = mcts_node.op_node_index
+    total_reward = sum(graph.get_node(node_index).value for node_index in mcts_node.path)
+    remaining_budget = graph.budget - mcts_node.get_path_distance(graph)
+    visited = set(mcts_node.path)
+    path = mcts_node.path[:]
+
+    while remaining_budget > 0:
+        neighbours = {k: v for k, v in graph.get_neighbours(current_index).items() if k not in visited}
+        if not neighbours:
+            break
+
+        # Use epsilon-greedy strategy to choose the next node
+        if random.random() < epsilon:
+            next_node = random.choice(list(neighbours.keys()))  # Randomly explore
+        else:
+            next_node = max(neighbours.keys(), key=lambda n: graph.get_node(n).value / neighbours[n])  # Greedy
+
+        distance = neighbours[next_node]
+        if distance > remaining_budget:
+            break
+        current_index = next_node
+        remaining_budget -= distance
+        total_reward += graph.get_node(current_index).value
+        visited.add(current_index)
+        path.append(current_index)
+
+    # print(f"Simulated Path: {path}, Reward: {total_reward}, Remaining Budget: {remaining_budget}")
+    return total_reward
 
 # Backpropagation Phase - After Simulation, propagate score back up tree. Updates total score and visit count for each node.
 def backpropagate(mcts_node: MCTSNode, reward):
@@ -133,8 +146,8 @@ def collect_visited_leaf_nodes(node):
     return leaf_nodes
 
 # Calls all above functions to run the MCTS Search
-def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=2000000):
-    fig, ax, G, pos = setup_plot(graph)
+def mcts_run_parallel_leaf(graph: OrienteeringGraph, start_node_index=0, num_simulations=1000000, num_parallel_simulations=2):
+    # fig, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)
     root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
@@ -143,7 +156,6 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
     print("Exploration constant:", exploration_constant)
 
     for _ in range(num_simulations):
-        # print("Simulation", i)
         #Selection and expansion for following nodes by calculating UCB
         mcts_node = root
         
@@ -178,8 +190,9 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
                     # No children or possible children left, break out to simulate
                     break
 
-        #Simulation
-        reward = simulate(graph, mcts_node)
+        #Parallel Simulation
+        # reward = simulate(graph, mcts_node)
+        reward = parallel_simulations(mcts_node, graph, num_parallel_simulations)
 
         #Backpropagations
         backpropagate(mcts_node,reward)
@@ -197,5 +210,5 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
     # Return best leaf node based on value first, then visits
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
-    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_path.png")
+    # plot_final_path(ax, G, pos, graph, best_node.path, filename="final_path.png")
     return best_node

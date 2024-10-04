@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from orienteering_problem import OrienteeringGraph
 import networkx as nx
+import numpy as np
 
 # Plot setup
 def setup_plot(graph: OrienteeringGraph):
@@ -12,9 +13,24 @@ def setup_plot(graph: OrienteeringGraph):
     for node in graph.get_nodes():
         G.add_node(node, pos=(graph.graph[node].x, graph.graph[node].y))
     
+    # Add edges to the graph (using adjacency list)
+    for node in graph.get_nodes():
+        for neighbor, distance in graph.get_neighbours(node).items():
+            G.add_edge(node, neighbor, weight=distance)
+
     # Plot nodes with labels
     pos = nx.get_node_attributes(G, 'pos')
+    # pos = {node: np.array(coord) * 100000 for node, coord in pos.items()}
     nx.draw(G, pos, ax=ax, with_labels=True, node_color='lightblue', node_size=500)
+
+    # Plot edges (the new part)
+    nx.draw_networkx_edges(G, pos, ax=ax, edge_color='black', width=1.5)
+
+    # Optionally, draw edge labels (distances)
+    edge_labels = {(n1, n2): f"{w['weight']:.1f}" for n1, n2, w in G.edges(data=True)}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, ax=ax)
+
+
     print("Setup graph")
     plt.pause(0.0000001)
     return fig, ax, G, pos
@@ -27,7 +43,7 @@ def update_plot(ax, G, pos, parent_idx, child_idx):
     plt.draw()
     plt.pause(0.0000001)  # Small pause to allow the plot to update
 
-def plot_final_path(ax, G, pos, graph: OrienteeringGraph, path):
+def plot_final_path(ax, G, pos, graph: OrienteeringGraph, path, filename):
     red_edges = []
     edge_labels = {}
 
@@ -43,6 +59,6 @@ def plot_final_path(ax, G, pos, graph: OrienteeringGraph, path):
 
     # Draw edge labels for the budget/distance
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red', ax=ax)
-
+    plt.savefig(filename)
     plt.draw()
     plt.pause(10)
