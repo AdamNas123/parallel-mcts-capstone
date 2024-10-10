@@ -146,7 +146,7 @@ def collect_visited_leaf_nodes(node):
     return leaf_nodes
 
 # Calls all above functions to run the MCTS Search
-def mcts_run_parallel_leaf(graph: OrienteeringGraph, start_node_index=0, num_simulations=1000000, num_parallel_simulations=2):
+def mcts_run_parallel_leaf(graph: OrienteeringGraph, start_node_index=0, num_simulations=2000000, num_parallel_simulations=2):
     # fig, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)

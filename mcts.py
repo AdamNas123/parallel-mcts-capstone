@@ -107,6 +107,38 @@ def simulate(graph: OrienteeringGraph, mcts_node: MCTSNode):
     return total_reward
 
 
+# Simulate with Epsilon-Greedy Approach
+def simulate_epsilon(graph: OrienteeringGraph, mcts_node: MCTSNode, epsilon=0.3):
+    current_index = mcts_node.op_node_index
+    total_reward = sum(graph.get_node(node_index).value for node_index in mcts_node.path)
+    remaining_budget = graph.budget - mcts_node.get_path_distance(graph)
+    visited = set(mcts_node.path)
+    path = mcts_node.path[:]
+
+    while remaining_budget > 0:
+        neighbours = {k: v for k, v in graph.get_neighbours(current_index).items() if k not in visited}
+        if not neighbours:
+            break
+
+        # Use epsilon-greedy strategy to choose the next node
+        if random.random() < epsilon:
+            next_node = random.choice(list(neighbours.keys()))  # Randomly explore
+        else:
+            next_node = max(neighbours.keys(), key=lambda n: graph.get_node(n).value / neighbours[n])  # Greedy
+
+        distance = neighbours[next_node]
+        if distance > remaining_budget:
+            break
+        current_index = next_node
+        remaining_budget -= distance
+        total_reward += graph.get_node(current_index).value
+        visited.add(current_index)
+        path.append(current_index)
+
+    # print(f"Simulated Path: {path}, Reward: {total_reward}, Remaining Budget: {remaining_budget}")
+    return total_reward
+
+
 # Backpropagation Phase - After Simulation, propagate score back up tree. Updates total score and visit count for each node.
 def backpropagate(mcts_node: MCTSNode, reward):
     current_node = mcts_node
@@ -179,7 +211,7 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
                     break
 
         #Simulation
-        reward = simulate(graph, mcts_node)
+        reward = simulate_epsilon(graph, mcts_node)
 
         #Backpropagations
         backpropagate(mcts_node,reward)

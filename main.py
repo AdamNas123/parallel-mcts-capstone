@@ -1,6 +1,7 @@
 from orienteering_problem import Node, OrienteeringGraph, calculate_euclidian_distance
 from mcts import mcts_run
 from mcts_parallel_leaf import mcts_run_parallel_leaf
+from mcts_parallel_root import mcts_run_parallel_root
 import time
 
 TSILIGIRIRIDES_1_MAXIMUM_REWARD = 285
@@ -46,8 +47,9 @@ def main():
 
     #Start at first node with empty path and no time spent
     start_time = time.time()
-    best_mcts_node = mcts_run(graph=orienteering_graph, start_node_index=0)
+    # best_mcts_node = mcts_run(graph=orienteering_graph, start_node_index=0)
     # best_mcts_node = mcts_run_parallel_leaf(graph=orienteering_graph, start_node_index=0)
+    best_mcts_node = mcts_run_parallel_root(graph=orienteering_graph, start_node_index=0)
     end_time = time.time()
     elapsed_time = end_time - start_time
     print("MCTS Search Time:", elapsed_time)
