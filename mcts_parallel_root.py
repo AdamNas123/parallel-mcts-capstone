@@ -142,7 +142,7 @@ def parallel_mcts_select_best_node(aggregated_root, graph):
 
 # Calls all above functions to run the MCTS Search
 # Function to run a single MCTS instance
-def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations, exploration_constant=0.4):
+def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: int, exploration_constant=0.4):
     for simulation in range(num_simulations):
         # print("On iteration", simulation)
         mcts_node = root
