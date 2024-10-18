@@ -2,12 +2,12 @@ import math
 import random 
 
 from orienteering_problem import OrienteeringGraph
-from tree_node import MCTSNode
+from tree_node_spinlock import MCTSNode
 from plot import setup_plot, update_plot, plot_final_path
-from multiprocessing import Lock
+# from multiprocessing import Lock
 import concurrent.futures
 
-tree_lock = Lock()
+# tree_lock = Lock()
 
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
     current_index = mcts_node.op_node_index
@@ -34,27 +34,28 @@ def ucb1(node, exploration_constant):
 
 #Selection and Expansion phase - Add children with global mutex
 def select_and_expand(mcts_node: MCTSNode, graph: OrienteeringGraph, exploration_constant: float):
-    with tree_lock:
-        # print("Expanding tree from mcts node:", mcts_node.path)
-        if not mcts_node.children and mcts_node.possible_children:
-            next_child = mcts_node.possible_children.pop(0)
-            new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
-            mcts_node.add_child(new_child_node)
-            mcts_node = new_child_node
-        else:
-            while True:
-                if mcts_node.possible_children:
-                    next_child = mcts_node.possible_children.pop(0)
-                    new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
-                    mcts_node.add_child(new_child_node)
-                    mcts_node = new_child_node
-                    break
-                elif mcts_node.children:
-                    mcts_node = max(mcts_node.children, key=lambda node: ucb1(node, exploration_constant))
-                else:
-                    break
-        # print("Expanded tree with new mcts node:", mcts_node.path)
-    return mcts_node
+    while True:
+        # Acquire the spinlock for the node
+        print(f"Trying to acquire lock on node {mcts_node.op_node_index} for expansion")
+        mcts_node.lock.acquire()
+        print(f"Acquired lock on node {mcts_node.op_node_index} for expansion")
+        try:
+            if not mcts_node.children and mcts_node.possible_children:
+                # Expand a new child
+                next_child = mcts_node.possible_children.pop(0)
+                new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
+                mcts_node.add_child(new_child_node)
+                return new_child_node  # Return after expanding
+            elif mcts_node.children:
+                # Select the best child based on UCB1
+                best_child = max(mcts_node.children, key=lambda node: ucb1(node, exploration_constant))
+                mcts_node = best_child  # Move to the child node
+            else:
+                return mcts_node  # If no children, return the current node
+        finally:
+            # Always release the lock after acquiring it
+            print(f"Releasing lock on node {mcts_node.op_node_index} after expansion")
+            mcts_node.lock.release()
 
 # Simulation Phase - Randomly simulate path from current node until budget limit is reached or no more nodes available
 def simulate(graph: OrienteeringGraph, mcts_node: MCTSNode):
@@ -125,11 +126,18 @@ def simulate_epsilon(graph: OrienteeringGraph, mcts_node: MCTSNode, epsilon=0.3)
 # Backpropagation Phase - After Simulation, propagate score back up tree. Updates total score and visit count for each node.
 def backpropagate(mcts_node: MCTSNode, reward):
     current_node = mcts_node
-    with tree_lock:
-        while current_node is not None:
+    while current_node is not None:
+        print(f"Trying to acquire lock on node {current_node.op_node_index} for expansion")
+        current_node.lock.acquire()
+        print(f"Acquired lock on node {current_node.op_node_index} for expansion")
+        
+        try:
             # print("Backpropagating value of", reward, "to node with path:", current_node.path)
             current_node.update_value(reward)
-            current_node = current_node.parent
+        finally:
+            print(f"Releasing lock on node {current_node.op_node_index} after expansion")
+            current_node.lock.release()
+        current_node = current_node.parent
 
 
 def collect_visited_leaf_nodes(node):
@@ -164,11 +172,11 @@ def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: i
 
 
 # Calls all above functions to run the MCTS Search
-def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_simulations=50000, num_threads=4):
+def mcts_run_parallel_tree_local_mutex_spinlock(graph: OrienteeringGraph, start_node_index=0, num_simulations=50000, num_threads=4):
     fig, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)
-    root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
+    root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True, lock=True)
     add_possible_children(root, graph)
     exploration_constant = 0.4 #Exploration constant
     print("Exploration constant:", exploration_constant)
@@ -186,48 +194,5 @@ def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_sim
     # Return best leaf node based on value first, then visits
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
-    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_paths/final_path_parallel_tree_budget_40.png")
+    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_paths/final_path_parallel_tree_local_mutex_spinlock_budget_40.png")
     return best_node
-
-    # for _ in range(num_simulations):
-    #     # print("Simulation", i)
-    #     #Selection and expansion for following nodes by calculating UCB
-    #     mcts_node = root
-        
-        # EXPANSION Phase
-          # If mcts node has no children but has possible children - Get first possible child and make it a real child
-    #     if not mcts_node.children and mcts_node.possible_children:
-    #         next_child = mcts_node.possible_children.pop(0)
-    #         new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
-    #         mcts_node.add_child(new_child_node)
-    #         mcts_node = new_child_node
-    #         # print("Selected and expanded possible child node from root", mcts_node.path, "with value:", mcts_node.value)
-    
-    #     # Else, if it has actual children, go through the below loop
-    #     else:
-    #         while True:
-    #             # If there is a possible child (unexplored), then expand it and break the expansion loop
-    #             if mcts_node.possible_children:
-    #                 next_child = mcts_node.possible_children.pop(0)
-    #                 new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
-    #                 mcts_node.add_child(new_child_node)
-    #                 mcts_node = new_child_node
-    #                 # print("Selected and expanded possible child node", mcts_node.path, "with value:", mcts_node.value)
-    #                 break  # Expansion finished, move to simulation
-    #             
-    #             # Else, if there are only already explored children, select the child with the best UCB value
-    #             elif mcts_node.children:
-    #                 mcts_node = max(mcts_node.children, key=lambda node: ucb1(node, exploration_constant))
-    #                 # print("Selected visited node", mcts_node.path, "with value:", mcts_node.value)
-    #             else:
-    #                 # No children or possible children left, break out to simulate
-    #                 break
-
-    #     #Simulation
-    #     reward = simulate_epsilon(graph, mcts_node)
-
-    #     #Backpropagations
-    #     backpropagate(mcts_node,reward)
-
-    #     #Before going back to root, add possible children of child node
-    #     add_possible_children(mcts_node=mcts_node, graph=graph)

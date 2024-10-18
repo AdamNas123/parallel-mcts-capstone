@@ -1,4 +1,4 @@
-from multiprocessing import Lock
+from spinlock import Spinlock
 from orienteering_problem import OrienteeringGraph
 class MCTSNode:
     def __init__(self,op_node_index, graph: OrienteeringGraph, parent=None, path=None, is_root=False, lock=False):
@@ -11,8 +11,13 @@ class MCTSNode:
         self.value = sum(graph.get_node(op_node).value for op_node in self.path)
         # self.value = 0
         self.is_root = is_root  # New flag for root node
-        self.lock = Lock() if lock else None
-        self.virtual_loss = 0
+        self.lock = Spinlock() if lock else None
+    
+    def lock_node(self):
+        self.lock.acquire()
+
+    def unlock_node(self):
+        self.lock.release()
 
     def add_possible_child(self, possible_child_node):
         self.possible_children.append(possible_child_node)

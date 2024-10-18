@@ -7,7 +7,7 @@ from plot import setup_plot, update_plot, plot_final_path
 from multiprocessing import Lock
 import concurrent.futures
 
-tree_lock = Lock()
+# tree_lock = Lock()
 
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
     current_index = mcts_node.op_node_index
@@ -34,18 +34,18 @@ def ucb1(node, exploration_constant):
 
 #Selection and Expansion phase - Add children with global mutex
 def select_and_expand(mcts_node: MCTSNode, graph: OrienteeringGraph, exploration_constant: float):
-    with tree_lock:
+    with mcts_node.lock:
         # print("Expanding tree from mcts node:", mcts_node.path)
         if not mcts_node.children and mcts_node.possible_children:
             next_child = mcts_node.possible_children.pop(0)
-            new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
+            new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child], lock=True)
             mcts_node.add_child(new_child_node)
             mcts_node = new_child_node
         else:
             while True:
                 if mcts_node.possible_children:
                     next_child = mcts_node.possible_children.pop(0)
-                    new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
+                    new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child], lock=True)
                     mcts_node.add_child(new_child_node)
                     mcts_node = new_child_node
                     break
@@ -125,8 +125,8 @@ def simulate_epsilon(graph: OrienteeringGraph, mcts_node: MCTSNode, epsilon=0.3)
 # Backpropagation Phase - After Simulation, propagate score back up tree. Updates total score and visit count for each node.
 def backpropagate(mcts_node: MCTSNode, reward):
     current_node = mcts_node
-    with tree_lock:
-        while current_node is not None:
+    while current_node is not None:
+        with current_node.lock:
             # print("Backpropagating value of", reward, "to node with path:", current_node.path)
             current_node.update_value(reward)
             current_node = current_node.parent
@@ -164,11 +164,11 @@ def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: i
 
 
 # Calls all above functions to run the MCTS Search
-def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_simulations=50000, num_threads=4):
+def mcts_run_parallel_tree_local_mutex(graph: OrienteeringGraph, start_node_index=0, num_simulations=50000, num_threads=4):
     fig, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)
-    root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
+    root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True, lock=True)
     add_possible_children(root, graph)
     exploration_constant = 0.4 #Exploration constant
     print("Exploration constant:", exploration_constant)
@@ -186,7 +186,7 @@ def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_sim
     # Return best leaf node based on value first, then visits
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
-    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_paths/final_path_parallel_tree_budget_40.png")
+    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_paths/final_path_parallel_tree_local_mutex_budget_40.png")
     return best_node
 
     # for _ in range(num_simulations):
