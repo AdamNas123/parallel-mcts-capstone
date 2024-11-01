@@ -3,7 +3,7 @@ import random
 
 from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-from plot import setup_plot, update_plot, plot_final_path
+from plot import setup_plot, update_plot, plot_final_path, plot_rewards
 
 
 
@@ -165,17 +165,16 @@ def collect_visited_leaf_nodes(node):
     return leaf_nodes
 
 # Calls all above functions to run the MCTS Search
-def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=195000):
+def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=1500000):
     fig, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)
     root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
     add_possible_children(root, graph)
-    exploration_constant = 0.4 #Exploration constant
+    exploration_constant = 0.4
     print("Exploration constant:", exploration_constant)
-
+    rewards_log = []
     for _ in range(num_simulations):
-        # print("Simulation", i)
         #Selection and expansion for following nodes by calculating UCB
         mcts_node = root
         
@@ -184,10 +183,6 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=19500
             new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
             mcts_node.add_child(new_child_node)
             mcts_node = new_child_node  # Move to the newly added child 
-            # print("Selected and expanded possible child node from root", mcts_node.path, "with value:", mcts_node.value)
-
-            # Update the plot when a new child node is officially added
-            # update_plot(ax, G, pos, mcts_node.parent.op_node_index, mcts_node.op_node_index)
         else:
             # If the node has any possible children, select the first possible child.
             while True:
@@ -197,10 +192,6 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=19500
                     new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
                     mcts_node.add_child(new_child_node)
                     mcts_node = new_child_node  # Move to the newly added child
-                    # print("Selected and expanded possible child node", mcts_node.path, "with value:", mcts_node.value)
-
-                    # Update the plot when a new child node is officially added
-                    # update_plot(ax, G, pos, mcts_node.parent.op_node_index, mcts_node.op_node_index)
                     break  # Expansion finished, move to simulation
                 # Else, select the child with the best UCB value
                 elif mcts_node.children:
@@ -212,7 +203,7 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=19500
 
         #Simulation
         reward = simulate_epsilon(graph, mcts_node)
-
+        rewards_log.append(reward)
         #Backpropagations
         backpropagate(mcts_node,reward)
 
@@ -229,5 +220,6 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=19500
     # Return best leaf node based on value first, then visits
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
-    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_path_budget_80.png")
+    plot_final_path(ax, G, pos, graph, best_node.path, filename=f"final_path_budget_{graph.budget}.png")
+    plot_rewards(rewards_log, filename=f"logs/base_mcts/rewards/budget_{graph.budget}_simulations_{num_simulations}.png", step=15000)
     return best_node

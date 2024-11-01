@@ -59,6 +59,7 @@ def setup_plot(graph: OrienteeringGraph):
     plt.tight_layout()
 
     print("Setup graph")
+    plt.savefig("Orienteering_Problem_Graph")
     plt.pause(0.0000001)
     return fig, ax, G, pos
 
@@ -89,3 +90,44 @@ def plot_final_path(ax, G, pos, graph: OrienteeringGraph, path, filename):
     plt.savefig(filename)
     plt.draw()
     plt.pause(10)
+
+def plot_rewards(rewards_log, filename, step=1000):
+    sampled_rewards = rewards_log[::step]
+    sampled_iterations = list(range(0, len(rewards_log), step))
+
+    plt.figure()
+    plt.plot(sampled_iterations, sampled_rewards, color="blue", linestyle="-", markersize=4, linewidth=1)
+    plt.xlabel("Simulation Iterations")
+    plt.ylabel("Reward")
+    plt.title("Reward over Iterations")
+    plt.ylim(bottom=0)  # Start y-axis from zero
+    plt.xlim(left=0)
+    plt.grid(True)
+    plt.savefig(filename)
+    plt.show()
+
+def plot_rewards_parallel(thread_rewards, averaged_rewards, filename, step=1000):
+    plt.figure()
+
+    sampled_rewards = averaged_rewards[::step]
+    sampled_iterations = list(range(0, len(averaged_rewards), step))
+
+    colors = ['red', 'green', 'orange', 'purple']
+    for index, rewards in enumerate(thread_rewards):
+        # Sample rewards for current thread
+        sampled_rewards = rewards[::step]
+        plt.plot(sampled_iterations, sampled_rewards, color=colors[index], linestyle="-", markersize=4, linewidth=1, label=f'Thread {index + 1}')
+
+    sampled_averaged_rewards = averaged_rewards[::step]
+    plt.plot(sampled_iterations, sampled_averaged_rewards, color='blue', linestyle="-", markersize=4, linewidth=2, label='Average Reward')
+    
+    plt.xlabel("Simulation Iterations")
+    plt.ylabel("Reward")
+    plt.title("Reward over Iterations")
+    plt.ylim(bottom=0)  # Start y-axis from zero
+    plt.xlim(left=0)
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig(filename)
+    plt.show()

@@ -3,9 +3,10 @@ import random
 
 from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-from plot import setup_plot, update_plot, plot_final_path
+from plot import setup_plot, update_plot, plot_final_path, plot_rewards_parallel
 from multiprocessing import Lock
-import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 
 tree_lock = Lock()
 
@@ -151,6 +152,8 @@ def collect_visited_leaf_nodes(node):
 
 
 def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: int, exploration_constant = 0.4):
+    intermediate_rewards = []
+    
     for simulation in range(num_simulations):
         mcts_node = root
         # Expansion
@@ -160,29 +163,38 @@ def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: i
 
         # Backpropagate the result
         backpropagate(mcts_node, reward)
-        
+        intermediate_rewards.append(reward)
+
         # Add possible children after simulation
         if not mcts_node.possible_children:
             add_possible_children(mcts_node, graph)
+    
     print("Finished a single mcts")
-
+    yield intermediate_rewards
 
 # Calls all above functions to run the MCTS Search
-def mcts_run_parallel_tree_virtual_loss(graph: OrienteeringGraph, start_node_index=0, num_simulations=50000, num_threads=4):
+def mcts_run_parallel_tree_virtual_loss(graph: OrienteeringGraph, start_node_index=0, num_simulations=205000, num_threads=4):
     fig, ax, G, pos = setup_plot(graph)
-    
+    all_rewards_over_time = []
+    thread_rewards = [[] for _ in range(num_threads)] 
+    exploration_constant = 0.4 
+
     # Selection for first node (root node)
     root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
     add_possible_children(root, graph)
-    exploration_constant = 0.4 #Exploration constant
-    print("Exploration constant:", exploration_constant)
+    
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = [executor.submit(run_single_mcts, graph, root, num_simulations) for _ in range(num_threads)]
-        # Ensure that all futures complete
-        concurrent.futures.wait(futures) 
-        for future in futures:
-            future.result()  # To raise any exceptions encountered during execution
+        
+        for thread_index, future in enumerate(as_completed(futures)):
+            for intermediate_results in future.result():
+                thread_rewards[thread_index].extend(intermediate_results)
+
+                for i, reward in enumerate(intermediate_results):
+                    if i >= len(all_rewards_over_time):
+                        all_rewards_over_time.append([]) 
+                    all_rewards_over_time[i].append(reward) 
 
     # Collect all leaf nodes
     leaf_nodes = collect_visited_leaf_nodes(root)
@@ -191,4 +203,8 @@ def mcts_run_parallel_tree_virtual_loss(graph: OrienteeringGraph, start_node_ind
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
     plot_final_path(ax, G, pos, graph, best_node.path, filename="final_paths/final_path_parallel_tree_budget_40.png")
+    
+    averaged_rewards = [sum(rewards) / len(rewards) for rewards in all_rewards_over_time]
+    plot_rewards_parallel(thread_rewards, averaged_rewards, filename=f"logs/parallel_tree_virtual_loss/results/simulations_{num_simulations // 1000}k.png")
+    
     return best_node
