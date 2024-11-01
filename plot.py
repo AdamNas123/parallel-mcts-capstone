@@ -97,9 +97,9 @@ def plot_rewards(rewards_log, filename, step=1000):
 
     plt.figure()
     plt.plot(sampled_iterations, sampled_rewards, color="blue", linestyle="-", markersize=4, linewidth=1)
-    plt.xlabel("Simulation Iterations")
+    plt.xlabel("Number of Rollouts")
     plt.ylabel("Reward")
-    plt.title("Reward over Iterations")
+    plt.title("Reward over Rollouts")
     plt.ylim(bottom=0)  # Start y-axis from zero
     plt.xlim(left=0)
     plt.grid(True)
@@ -129,5 +129,30 @@ def plot_rewards_parallel(thread_rewards, averaged_rewards, filename, step=1000)
     plt.grid(True)
     plt.legend()
 
+    plt.savefig(filename)
+    plt.show()
+
+def plot_rewards_root(thread_rewards, filename, step=1000):
+    #For each list within thread_rewards, get value of index and add to new array
+    rollout_rewards = []
+    
+    # Loop through each index in the sublists
+    for i in range(len(thread_rewards[0])):  
+        for rewards_list in thread_rewards:
+            rollout_rewards.append(rewards_list[i])
+
+    plt.figure()
+
+    sampled_rewards = rollout_rewards[::step]
+    sampled_iterations = list(range(0, len(rollout_rewards), step))
+
+    plt.figure()
+    plt.plot(sampled_iterations, sampled_rewards, color="blue", linestyle="-", markersize=4, linewidth=1)
+    plt.xlabel("Number of Rollouts")
+    plt.ylabel("Reward")
+    plt.title("Reward over Rollouts")
+    plt.ylim(bottom=0)  # Start y-axis from zero
+    plt.xlim(left=0)
+    plt.grid(True)
     plt.savefig(filename)
     plt.show()

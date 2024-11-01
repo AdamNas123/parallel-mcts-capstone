@@ -19,8 +19,6 @@ def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
         if (current_path_distance + distance) <= graph.budget and neighbour_index not in mcts_node.path:
             mcts_node.add_possible_child(neighbour_index)
             new_nodes.append(neighbour_index)
-    # print(f"Added all possible child nodes {new_nodes} to the node {mcts_node.path}")
-
 
 
 # Selection Phase - Select Child Nodes that maximise Upper Confidence Bound 1: 
@@ -43,17 +41,15 @@ def parallel_simulations(mcts_node, graph, num_parallel_simulations):
     
     with ThreadPoolExecutor(max_workers=num_parallel_simulations) as executor:
         # Submit the tasks
-        # print("Submitting parallel simulation tasks")
         futures = [executor.submit(simulation_task) for _ in range(num_parallel_simulations)]
         
         # Collect the results as they complete
         for future in as_completed(futures):
             rewards.append(future.result())
     
-    # Aggregate the rewards (e.g., using an average)
     aggregated_reward = sum(rewards) / len(rewards)
     
-    return aggregated_reward
+    return aggregated_reward, rewards
     
 
 
@@ -125,7 +121,6 @@ def backpropagate(mcts_node: MCTSNode, reward):
     current_node = mcts_node
     while current_node is not None:
         current_node.update_value(reward)
-        # print("Back propagating value of", reward, "to", current_node.path, ". Creating total value:", current_node.value, ". Visits are now:", current_node.visits)
         current_node = current_node.parent
 
 
@@ -133,28 +128,25 @@ def collect_visited_leaf_nodes(node):
     # Initialize list of leaf nodes
     leaf_nodes = []
 
-    # Check if the current node is a leaf node
-    # print("Node Index:", node.op_node_index, ", Parent:", node.parent, ", Visits:", node.visits, ", Value:", node.value, ", Children:", node.children, ", Path:", node.path) 
+    # Check if the current node is a leaf node 
     if not node.children:
-        # print("A Leaf Node!")
         leaf_nodes.append(node)
     else:
         # Recursively collect leaf nodes from children
         for child in node.children:
             leaf_nodes.extend(collect_visited_leaf_nodes(child))
-    # print("Leaf Nodes:", leaf_nodes)
     return leaf_nodes
 
 # Calls all above functions to run the MCTS Search
-def mcts_run_parallel_leaf(graph: OrienteeringGraph, start_node_index=0, num_simulations=210000, num_parallel_simulations=2):
+def mcts_run_parallel_leaf(graph: OrienteeringGraph, start_node_index=0, num_simulations=250000, num_parallel_simulations=4):
     fig, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)
     root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
     add_possible_children(root, graph)
     exploration_constant = 0.4 
-    print("Exploration constant:", exploration_constant)
-    rewards_log = []
+    all_rewards_log = []
+    averaged_rewards_log = []
 
     for _ in range(num_simulations):
         #Selection and expansion for following nodes by calculating UCB
@@ -183,11 +175,11 @@ def mcts_run_parallel_leaf(graph: OrienteeringGraph, start_node_index=0, num_sim
                     break
 
         #Parallel Simulation
-        reward = parallel_simulations(mcts_node, graph, num_parallel_simulations)
-        rewards_log.append(reward)
-
+        average_reward, rewards = parallel_simulations(mcts_node, graph, num_parallel_simulations)
+        averaged_rewards_log.append(average_reward)
+        all_rewards_log.extend(rewards)
         #Backpropagations
-        backpropagate(mcts_node,reward)
+        backpropagate(mcts_node,average_reward)
 
         #Before going back to root, add possible children of child node
         add_possible_children(mcts_node=mcts_node, graph=graph)
@@ -199,5 +191,10 @@ def mcts_run_parallel_leaf(graph: OrienteeringGraph, start_node_index=0, num_sim
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
     plot_final_path(ax, G, pos, graph, best_node.path, filename=f"final_path_budget_{graph.budget}.png")
-    plot_rewards(rewards_log, filename=f"logs/parallel_leaf/rewards/budget_{graph.budget}_simulations_{num_simulations}.png", step=10)
+    
+    #Uncomment to plot average rewards
+    # plot_rewards(averaged_rewards_log, filename=f"logs/parallel_leaf/rewards/budget_{graph.budget}_simulations_{num_simulations}.png", step=375)
+
+    #Plots rewards from each rollout (4 threads = 4 rollouts per iteration)
+    plot_rewards(all_rewards_log, filename=f"logs/parallel_leaf/rewards/budget_{graph.budget}_simulations_{num_simulations*num_parallel_simulations}.png", step=10000)
     return best_node

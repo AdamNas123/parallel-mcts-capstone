@@ -8,42 +8,6 @@ from plot import setup_plot, update_plot, plot_final_path, plot_rewards
 
 
 # Add Possible Neighbours (Unexpanded Children) - Used to Select best child node and expand into tree
-"""def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
-    current_index = mcts_node.op_node_index
-    current_path_distance = mcts_node.get_path_distance(graph)
-    neighbours = graph.get_neighbours(current_index)
-    new_nodes = []
-
-    # Check if it's the root node
-    # if mcts_node.is_root:
-    #     # Add all valid neighbours within budget as children
-    #     for neighbour_index, distance in neighbours.items():
-    #         if (current_path_distance + distance) <= graph.budget and neighbour_index not in mcts_node.path:
-    #             mcts_node.add_possible_child(neighbour_index)
-    #             new_nodes.append(neighbour_index)
-    #     # print(f"Added all possible child nodes {new_nodes} to the root node {mcts_node.path}")
-
-    # else:
-    # Sort neighbours by their value, and only add the top 3 or fewer within the budget
-    valid_neighbours = [(neighbour_index, distance) for neighbour_index, distance in neighbours.items() 
-                        if (current_path_distance + distance) <= graph.budget and neighbour_index not in mcts_node.path]
-    
-    # Sort by the node value-distance ratios in descending order
-    sorted_neighbours = sorted(valid_neighbours, key=lambda x: graph.get_node(x[0]).value / x[1], reverse=True)
-
-    # Add up to 3 neighbours
-    count = 0
-    for neighbour_index, distance in sorted_neighbours:
-        if count < 2:
-            mcts_node.add_possible_child(neighbour_index)
-            new_nodes.append(neighbour_index)
-            count += 1
-        else:
-            break
-    
-    print(f"Added possible child nodes {new_nodes} to the parent {mcts_node.path}")
-"""
-
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
     current_index = mcts_node.op_node_index
     current_path_distance = mcts_node.get_path_distance(graph)
@@ -66,11 +30,6 @@ def ucb1(node, exploration_constant):
     # print("Node:", node.path, "Exploitation value:", node.value / node.visits, "Exploration value:", exploration_constant * math.sqrt(math.log(node.parent.visits) / node.visits))
     ucb = (node.value / node.visits) + (exploration_constant * math.sqrt(math.log(node.parent.visits) / node.visits))
     return ucb
-
-
-# Expansion Phase - If selected node is not terminal, expand it by adding child node for each valid action
-# def expand_tree(mcts_node: MCTSNode, graph: OrienteeringGraph):
-    
 
 
 # Simulation Phase - Randomly simulate path from current node until budget limit is reached or no more nodes available
@@ -212,10 +171,6 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=15000
 
     # Collect all leaf nodes
     leaf_nodes = collect_visited_leaf_nodes(root)
-    
-    # If there are no leaf nodes, fallback to children of root (unlikely)
-    # if not leaf_nodes:
-    #     leaf_nodes = root.children
 
     # Return best leaf node based on value first, then visits
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))

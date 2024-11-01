@@ -3,7 +3,7 @@ import random
 
 from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-from plot import setup_plot, update_plot, plot_final_path, plot_rewards_parallel
+from plot import setup_plot, plot_final_path, plot_rewards_parallel, plot_rewards_root
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
@@ -227,7 +227,7 @@ def aggregate_root_results(root_nodes, graph):
 
 
 # Main MCTS function with root parallelization
-def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_simulations=205000, num_threads=4):
+def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_simulations=3750, num_threads=4):
     fig, ax, G, pos = setup_plot(graph)
     exploration_constant=0.4
     all_rewards_over_time = []
@@ -265,5 +265,6 @@ def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_sim
     
     plot_final_path(ax, G, pos, graph, best_node.path, filename="final_path_parallel_root.png")
     averaged_rewards = [sum(rewards) / len(rewards) for rewards in all_rewards_over_time]
-    plot_rewards_parallel(thread_rewards, averaged_rewards, filename=f"logs/parallel_root/results/simulations_{num_simulations // 1000}k.png")
+    # plot_rewards_parallel(thread_rewards, averaged_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations}.png")
+    plot_rewards_root(thread_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=375)
     return best_node
