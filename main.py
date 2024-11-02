@@ -14,7 +14,7 @@ SET_66_MAXIMUM_REWARD = 1660
 def main():
     # Initialise orienteering graph and add nodes to the graph
     orienteering_graph = OrienteeringGraph(budget=0)
-    file = "tsiligirides_1/tsiligirides_problem_1_budget_20.txt"
+    file = "tsiligirides_1/tsiligirides_problem_1_budget_60.txt"
     if "tsiligirides" in file:
         maximum_reward = TSILIGIRIRIDES_1_MAXIMUM_REWARD
     elif "set_66" in file:
@@ -53,10 +53,10 @@ def main():
     start_time = time.time()
     # best_mcts_node = mcts_run(graph=orienteering_graph, start_node_index=0)
     # best_mcts_node = mcts_run_parallel_leaf(graph=orienteering_graph, start_node_index=0)
-    best_mcts_node = mcts_run_parallel_root(graph=orienteering_graph, start_node_index=0)
+    # best_mcts_node = mcts_run_parallel_root(graph=orienteering_graph, start_node_index=0)
     # best_mcts_node = mcts_run_parallel_tree(graph=orienteering_graph, start_node_index=0)
     # best_mcts_node = mcts_run_parallel_tree_local_mutex(graph=orienteering_graph, start_node_index=0)
-    # best_mcts_node = mcts_run_parallel_tree_virtual_loss(graph=orienteering_graph, start_node_index=0)
+    best_mcts_node = mcts_run_parallel_tree_virtual_loss(graph=orienteering_graph, start_node_index=0)
     end_time = time.time()
     elapsed_time = end_time - start_time
     print("MCTS Search Time:", elapsed_time)

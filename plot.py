@@ -106,7 +106,7 @@ def plot_rewards(rewards_log, filename, step=1000):
     plt.savefig(filename)
     plt.show()
 
-def plot_rewards_parallel(thread_rewards, averaged_rewards, filename, step=1000):
+def plot_rewards_average(thread_rewards, averaged_rewards, filename, step=1000):
     plt.figure()
 
     sampled_rewards = averaged_rewards[::step]
@@ -132,19 +132,19 @@ def plot_rewards_parallel(thread_rewards, averaged_rewards, filename, step=1000)
     plt.savefig(filename)
     plt.show()
 
-def plot_rewards_root(thread_rewards, filename, step=1000):
+def plot_rewards_parallel(thread_rewards, filename, step=1000):
     #For each list within thread_rewards, get value of index and add to new array
-    rollout_rewards = []
+    # rollout_rewards = []
     
-    # Loop through each index in the sublists
-    for i in range(len(thread_rewards[0])):  
-        for rewards_list in thread_rewards:
-            rollout_rewards.append(rewards_list[i])
+    # # Loop through each index in the sublists
+    # for i in range(len(thread_rewards[0])):  
+    #     for rewards_list in thread_rewards:
+    #         rollout_rewards.append(rewards_list[i])
 
     plt.figure()
 
-    sampled_rewards = rollout_rewards[::step]
-    sampled_iterations = list(range(0, len(rollout_rewards), step))
+    sampled_rewards = thread_rewards[::step]
+    sampled_iterations = list(range(0, len(thread_rewards), step))
 
     plt.figure()
     plt.plot(sampled_iterations, sampled_rewards, color="blue", linestyle="-", markersize=4, linewidth=1)

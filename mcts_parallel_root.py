@@ -3,10 +3,13 @@ import random
 
 from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-from plot import setup_plot, plot_final_path, plot_rewards_parallel, plot_rewards_root
+from plot import setup_plot, plot_final_path, plot_rewards_parallel, plot_rewards_average
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
+from queue import Queue
+
+rewards_queue = Queue()
 
 # Add Possible Neighbours (Unexpanded Children) - Used to Select best child node and expand into tree
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
@@ -22,8 +25,6 @@ def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
             new_nodes.append(neighbour_index)
     # print(f"Added all possible child nodes {new_nodes} to the node {mcts_node.path}")
 
-
-
 # Selection Phase - Select Child Nodes that maximise Upper Confidence Bound 1: 
 def ucb1(node, exploration_constant):
     if node.visits == 0:
@@ -32,6 +33,26 @@ def ucb1(node, exploration_constant):
     ucb = (node.value / node.visits) + (exploration_constant * math.sqrt(math.log(node.parent.visits) / node.visits))
     return ucb   
 
+#Selection and Expansion phase - Add children with global mutex
+def select_and_expand(mcts_node: MCTSNode, graph: OrienteeringGraph, exploration_constant: float):
+    if not mcts_node.children and mcts_node.possible_children:
+            next_child = mcts_node.possible_children.pop(0)
+            new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
+            mcts_node.add_child(new_child_node)
+            mcts_node = new_child_node
+    else:
+        while True:
+            if mcts_node.possible_children:
+                next_child = mcts_node.possible_children.pop(0)
+                new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
+                mcts_node.add_child(new_child_node)
+                mcts_node = new_child_node
+                break
+            elif mcts_node.children:
+                mcts_node = max(mcts_node.children, key=lambda node: ucb1(node, exploration_constant))
+            else:
+                break
+    return mcts_node
 
 # Simulation Phase - Randomly simulate path from current node until budget limit is reached or no more nodes available
 def simulate(graph: OrienteeringGraph, mcts_node: MCTSNode):
@@ -101,24 +122,19 @@ def backpropagate(mcts_node: MCTSNode, reward):
     current_node = mcts_node
     while current_node is not None:
         current_node.update_value(reward)
-        # print("Back propagating value of", reward, "to", current_node.path, ". Creating total value:", current_node.value, ". Visits are now:", current_node.visits)
         current_node = current_node.parent
 
 
 def collect_visited_leaf_nodes(node):
-    # Initialize list of leaf nodes
     leaf_nodes = []
 
     # Check if the current node is a leaf node
-    # print("Node Index:", node.op_node_index, ", Parent:", node.parent, ", Visits:", node.visits, ", Value:", node.value, ", Children:", node.children, ", Path:", node.path) 
     if not node.children:
-        # print("A Leaf Node!")
         leaf_nodes.append(node)
     else:
         # Recursively collect leaf nodes from children
         for child in node.children:
             leaf_nodes.extend(collect_visited_leaf_nodes(child))
-    # print("Leaf Nodes:", leaf_nodes)
     return leaf_nodes
 
 # After merging root children, collect leaf nodes from each tree and select the best
@@ -139,45 +155,31 @@ def parallel_mcts_select_best_node(aggregated_root, graph):
 
     return best_leaf_node
 
-# Calls all above functions to run the MCTS Search
 # Function to run a single MCTS instance
 def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: int, exploration_constant=0.4):
-    intermediate_rewards = []
+    # intermediate_rewards = []
 
-    for simulation in range(num_simulations):
-        # print("On iteration", simulation)
-        mcts_node = root
-        if not mcts_node.children and mcts_node.possible_children:
-            next_child = mcts_node.possible_children.pop(0)
-            new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
-            mcts_node.add_child(new_child_node)
-            mcts_node = new_child_node
-        else:
-            while True:
-                if mcts_node.possible_children:
-                    next_child = mcts_node.possible_children.pop(0)
-                    new_child_node = MCTSNode(op_node_index=next_child, graph=graph, parent=mcts_node, path=mcts_node.path + [next_child])
-                    mcts_node.add_child(new_child_node)
-                    mcts_node = new_child_node
-                    break
-                elif mcts_node.children:
-                    mcts_node = max(mcts_node.children, key=lambda node: ucb1(node, exploration_constant))
-                else:
-                    break
+    for _ in range(num_simulations):
+        # mcts_node = root
 
+        # Selection and Expansion
+        mcts_node = select_and_expand(root,graph, exploration_constant)
+
+        # Simulate from the current node
         reward = simulate_epsilon(graph, mcts_node)
-        backpropagate(mcts_node, reward)
-        add_possible_children(mcts_node, graph)
-        intermediate_rewards.append(reward)
-        # Yield intermediate rewards every `yield_interval` iterations
-        # if (simulation + 1) % yield_interval == 0:
-        #     intermediate_rewards.append(reward)
-        #     print(f"Simulation {simulation + 1}: Intermediate reward added - {reward}")
-        #     yield intermediate_rewards
+        rewards_queue.put(reward)
+        # intermediate_rewards.append(reward)
 
+        # Backpropagate the result
+        backpropagate(mcts_node, reward)
+        
+        # Add possible children after simulation
+        if not mcts_node.possible_children:
+            add_possible_children(mcts_node, graph)
+        
     
     print("Finished a single mcts")
-    yield intermediate_rewards, root
+    yield root
 
 # Aggregates statistics from multiple root nodes
 def aggregate_child_nodes(aggregated_node, child_node, path_to_node_map, graph):
@@ -185,7 +187,6 @@ def aggregate_child_nodes(aggregated_node, child_node, path_to_node_map, graph):
     corresponding_child = path_to_node_map.get(tuple(child_node.path), None)
 
     if corresponding_child:
-        # print("Found Corresponding child with path", corresponding_child.path)
         corresponding_child.visits += child_node.visits
         corresponding_child.value += child_node.value
 
@@ -193,9 +194,7 @@ def aggregate_child_nodes(aggregated_node, child_node, path_to_node_map, graph):
         for grandchild in child_node.children:
             aggregate_child_nodes(corresponding_child, grandchild, path_to_node_map, graph)
     else:
-        # Instead of deep copying the entire child_node, only add essential values and children
         # Create a new shallow copy of the node without its children
-        # print("No corresponding child found, creating new child with path", child_node.path)
         new_child = MCTSNode(
             op_node_index=child_node.op_node_index,
             parent=aggregated_node,
@@ -212,27 +211,26 @@ def aggregate_child_nodes(aggregated_node, child_node, path_to_node_map, graph):
             aggregate_child_nodes(new_child, grandchild, path_to_node_map, graph)
 
 def aggregate_root_results(root_nodes, graph):
-    aggregated_root = deepcopy(root_nodes[0])  # Create a deep copy of the first root (shallow copy below)
-    path_to_node_map = {tuple(child.path): child for child in aggregated_root.children}  # Map paths to children
+    aggregated_root = deepcopy(root_nodes[0])  
+    # Map paths to children
+    path_to_node_map = {tuple(child.path): child for child in aggregated_root.children} 
 
     # Iterate over all other root nodes
     for i in range(1, len(root_nodes)):
         for child in root_nodes[i].children:
             # Aggregate the entire subtree of each child recursively
             aggregate_child_nodes(aggregated_root, child, path_to_node_map, graph)
-
     return aggregated_root
 
 
-
-
 # Main MCTS function with root parallelization
-def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_simulations=3750, num_threads=4):
-    fig, ax, G, pos = setup_plot(graph)
+def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_simulations=50000, num_threads=4):
+    _, ax, G, pos = setup_plot(graph)
     exploration_constant=0.4
-    all_rewards_over_time = []
-    thread_rewards = [[] for _ in range(num_threads)] 
-    final_root_nodes = [] 
+    ordered_rewards = []
+    final_root_nodes = []
+    # all_rewards_over_time = []
+    # thread_rewards = [[] for _ in range(num_threads)]  
 
     # Create independent root nodes for each thread
     root_nodes = [MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True) for _ in range(num_threads)]
@@ -244,27 +242,37 @@ def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_sim
         futures = [executor.submit(run_single_mcts, graph, root, num_simulations, exploration_constant) for root in root_nodes]
         # parallel_roots = [f.result() for f in futures]
 
-    # Collect intermediate results over time and final root nodes
-        for thread_index, future in enumerate(as_completed(futures)):
-            for result in future.result():
-                intermediate_rewards, final_root = result
+        # Collect intermediate results over time and final root nodes
+        for future in as_completed(futures):
+            for final_root in future.result():
                 final_root_nodes.append(final_root)
+        # for thread_index, future in enumerate(as_completed(futures)):
+        #     for result in future.result():
+        #         intermediate_rewards, final_root = result
+        #         final_root_nodes.append(final_root)
 
-                thread_rewards[thread_index].extend(intermediate_rewards)
+        #         thread_rewards[thread_index].extend(intermediate_rewards)
                 
-                for i, reward in enumerate(intermediate_rewards):
-                    if i >= len(all_rewards_over_time):
-                        all_rewards_over_time.append([])  # Initialize a new list for each new iteration index
-                    all_rewards_over_time[i].append(reward) 
+        #         for i, reward in enumerate(intermediate_rewards):
+        #             if i >= len(all_rewards_over_time):
+        #                 all_rewards_over_time.append([])  # Initialize a new list for each new iteration index
+        #             all_rewards_over_time[i].append(reward) 
 
     # Aggregate the results of all parallel root nodes
     aggregated_root = aggregate_root_results(final_root_nodes, graph)
     
+    while not rewards_queue.empty():
+        ordered_rewards.append(rewards_queue.get())
+
     # After all simulations, select the best node from all root nodes based on leaf nodes
     best_node = parallel_mcts_select_best_node(aggregated_root, graph)
     
+    #Plot final chosen path
     plot_final_path(ax, G, pos, graph, best_node.path, filename="final_path_parallel_root.png")
-    averaged_rewards = [sum(rewards) / len(rewards) for rewards in all_rewards_over_time]
-    # plot_rewards_parallel(thread_rewards, averaged_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations}.png")
-    plot_rewards_root(thread_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=375)
+
+    #Plot Rollout Rewards
+    plot_rewards_parallel(ordered_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=5000)
+    # averaged_rewards = [sum(rewards) / len(rewards) for rewards in all_rewards_over_time]
+    # plot_rewards_average(thread_rewards, averaged_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations}.png")
+    
     return best_node
