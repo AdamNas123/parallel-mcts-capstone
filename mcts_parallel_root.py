@@ -1,15 +1,17 @@
 import math
 import random 
+import time
 
 from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-from plot import setup_plot, plot_final_path, plot_rewards_parallel, plot_rewards_average
+from plot import setup_plot, plot_final_path, plot_rewards_parallel, plot_rewards_average, plot_rewards_time, plot_rewards_time_parallel
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from queue import Queue
 
 rewards_queue = Queue()
+time_queue = Queue()
 
 # Add Possible Neighbours (Unexpanded Children) - Used to Select best child node and expand into tree
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
@@ -168,6 +170,8 @@ def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: i
         # Simulate from the current node
         reward = simulate_epsilon(graph, mcts_node)
         rewards_queue.put(reward)
+        timestamp = time.time()
+        time_queue.put(timestamp)
         # intermediate_rewards.append(reward)
 
         # Backpropagate the result
@@ -224,14 +228,16 @@ def aggregate_root_results(root_nodes, graph):
 
 
 # Main MCTS function with root parallelization
-def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_simulations=50000, num_threads=4):
-    _, ax, G, pos = setup_plot(graph)
+def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_simulations=31250, num_threads=16):
+    # _, ax, G, pos = setup_plot(graph)
     exploration_constant=0.4
     ordered_rewards = []
+    time_log = []
     final_root_nodes = []
     # all_rewards_over_time = []
     # thread_rewards = [[] for _ in range(num_threads)]  
-
+    
+    start_time = time.time()
     # Create independent root nodes for each thread
     root_nodes = [MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True) for _ in range(num_threads)]
     for root in root_nodes:
@@ -246,6 +252,7 @@ def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_sim
         for future in as_completed(futures):
             for final_root in future.result():
                 final_root_nodes.append(final_root)
+
         # for thread_index, future in enumerate(as_completed(futures)):
         #     for result in future.result():
         #         intermediate_rewards, final_root = result
@@ -261,18 +268,22 @@ def mcts_run_parallel_root(graph: OrienteeringGraph, start_node_index=0, num_sim
     # Aggregate the results of all parallel root nodes
     aggregated_root = aggregate_root_results(final_root_nodes, graph)
     
-    while not rewards_queue.empty():
+    while not rewards_queue.empty() and not time_queue.empty():
         ordered_rewards.append(rewards_queue.get())
+        timestamp = time_queue.get() - start_time
+        time_log.append(timestamp)
 
     # After all simulations, select the best node from all root nodes based on leaf nodes
     best_node = parallel_mcts_select_best_node(aggregated_root, graph)
     
     #Plot final chosen path
-    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_path_parallel_root.png")
+    # plot_final_path(ax, G, pos, graph, best_node.path, filename="final_path_parallel_root.png")
 
     #Plot Rollout Rewards
-    plot_rewards_parallel(ordered_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=5000)
+    plot_rewards_parallel(ordered_rewards, filename=f"logs/parallel_root/threads/results/threads_{num_threads}_budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=12500)
     # averaged_rewards = [sum(rewards) / len(rewards) for rewards in all_rewards_over_time]
     # plot_rewards_average(thread_rewards, averaged_rewards, filename=f"logs/parallel_root/results/budget_{graph.budget}_simulations_{num_simulations}.png")
     
+    #Plot Time Rewards
+    plot_rewards_time_parallel(time_log, ordered_rewards, filename=f"logs/parallel_root/threads/results_time/threads_{num_threads}_budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=12500)
     return best_node

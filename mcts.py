@@ -1,9 +1,10 @@
 import math
 import random 
+import time
 
 from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-from plot import setup_plot, update_plot, plot_final_path, plot_rewards
+from plot import setup_plot, plot_final_path, plot_rewards, plot_rewards_time
 
 
 
@@ -139,7 +140,7 @@ def collect_visited_leaf_nodes(node):
     return leaf_nodes
 
 # Calls all above functions to run the MCTS Search
-def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=200000):
+def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=750000):
     _, ax, G, pos = setup_plot(graph)
     
     # Selection for first node (root node)
@@ -148,13 +149,25 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
     exploration_constant = 0.4
     print("Exploration constant:", exploration_constant)
     rewards_log = []
+    time_log = []
+
+    start_time = time.time()
+
     for _ in range(num_simulations):       
         # Selection and Expansion
         mcts_node = select_and_expand(root,graph, exploration_constant)
 
         #Simulation
         reward = simulate_epsilon(graph, mcts_node)
+        
+        #Log rewards based on time intervals
         rewards_log.append(reward)
+        current_time = time.time()
+        time_log.append(current_time - start_time) 
+
+        # Uncomment below to append rewards for iterations
+        # rewards_log.append(reward)
+        
         #Backpropagations
         backpropagate(mcts_node,reward)
 
@@ -168,5 +181,6 @@ def mcts_run(graph: OrienteeringGraph, start_node_index=0, num_simulations=20000
     # best_node = max(leaf_nodes, key=lambda n: (n.value, n.visits))
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
     plot_final_path(ax, G, pos, graph, best_node.path, filename=f"final_path_budget_{graph.budget}.png")
-    plot_rewards(rewards_log, filename=f"logs/base_mcts/rewards/budget_{graph.budget}_simulations_{num_simulations}.png", step=5000)
+    # plot_rewards(rewards_log, filename=f"logs/base_mcts/rewards/budget_{graph.budget}_simulations_{num_simulations}.png", step=5000)
+    plot_rewards_time(time_log, rewards_log, f"logs/base_mcts/rewards_time/budget_{graph.budget}_simulations_{num_simulations}.png", step=18750)
     return best_node

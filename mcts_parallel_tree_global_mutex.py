@@ -1,15 +1,17 @@
 import math
 import random 
+import time
 
 from orienteering_problem import OrienteeringGraph
 from tree_node import MCTSNode
-from plot import setup_plot, plot_final_path, plot_rewards_parallel, plot_rewards_average
+from plot import setup_plot, plot_final_path, plot_rewards_parallel, plot_rewards_average, plot_rewards_time_parallel
 from multiprocessing import Lock
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from queue import Queue
 
 tree_lock = Lock()
 rewards_queue = Queue()
+time_queue = Queue()
 
 def add_possible_children(mcts_node: MCTSNode, graph: OrienteeringGraph):
     current_index = mcts_node.op_node_index
@@ -150,6 +152,8 @@ def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: i
         # Simulate from the current node
         reward = simulate_epsilon(graph, mcts_node)
         rewards_queue.put(reward)
+        timestamp = time.time()
+        time_queue.put(timestamp)
         # intermediate_rewards.append(reward)
 
         # Backpropagate the result
@@ -164,13 +168,15 @@ def run_single_mcts(graph: OrienteeringGraph, root: MCTSNode, num_simulations: i
 
 
 # Calls all above functions to run the MCTS Search
-def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_simulations=375000, num_threads=4):
-    _, ax, G, pos = setup_plot(graph)
+def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_simulations=31250, num_threads=16):
+    # _, ax, G, pos = setup_plot(graph)
     ordered_rewards = []
+    time_log = []
     exploration_constant = 0.4
     # all_rewards_over_time = []
     # thread_rewards = [[] for _ in range(num_threads)] 
 
+    start_time = time.time()
     # Selection for first node (root node)
     root = MCTSNode(op_node_index=start_node_index, graph=graph, is_root=True)
     add_possible_children(root, graph)
@@ -193,6 +199,8 @@ def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_sim
     
     while not rewards_queue.empty():
         ordered_rewards.append(rewards_queue.get())
+        timestamp = time_queue.get() - start_time
+        time_log.append(timestamp)
     
     # Collect all leaf nodes
     leaf_nodes = collect_visited_leaf_nodes(root)
@@ -202,11 +210,14 @@ def mcts_run_parallel_tree(graph: OrienteeringGraph, start_node_index=0, num_sim
     best_node = max((n for n in leaf_nodes if n.visits > 0), key=lambda n: (n.value), default=None)
 
     #Plot final chosen path
-    plot_final_path(ax, G, pos, graph, best_node.path, filename="final_paths/final_path_parallel_tree_budget_40.png")
+    # plot_final_path(ax, G, pos, graph, best_node.path, filename="final_paths/final_path_parallel_tree_budget_40.png")
     
     #Plot rollout rewards
-    plot_rewards_parallel(ordered_rewards, filename=f"logs/parallel_tree_global_mutex/results/budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=37500)
+    plot_rewards_parallel(ordered_rewards, filename=f"logs/parallel_tree_global_mutex/threads/results/threads_{num_threads}_budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=12500)
     # averaged_rewards = [sum(rewards) / len(rewards) for rewards in all_rewards_over_time]
     # plot_rewards_average(thread_rewards, averaged_rewards, filename=f"logs/parallel_tree_global_mutex/results/budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=5000)
     
+    #Plot Time Rewards
+    plot_rewards_time_parallel(time_log, ordered_rewards, filename=f"logs/parallel_tree_global_mutex/threads/results_time/threads_{num_threads}_budget_{graph.budget}_simulations_{num_simulations*num_threads}.png", step=12500)
+
     return best_node

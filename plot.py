@@ -6,19 +6,19 @@ import numpy as np
 # Define color mapping based on node value
 def get_node_colour(value):
     if value == 0:
-        return 'lightgrey'  # Greyed out for value 0
+        return 'lightgrey'
     elif value == 5:
-        return 'darkgrey'  # Darker grey for value 5
+        return 'darkgrey'
     elif value == 10:
-        return 'lightgreen'  # Light green for value 10
+        return 'lightgreen' 
     elif value == 15:
-        return 'green'  # Normal green for value 15
+        return 'green'
     else:
-        return 'white'  # Default color if the value is not 0, 5, 10, or 15
+        return 'white'
 
 # Plot setup
 def setup_plot(graph: OrienteeringGraph):
-    plt.ion()  # Interactive mode on
+    plt.ion()
     fig, ax = plt.subplots()
     G = nx.Graph()
     
@@ -53,7 +53,7 @@ def setup_plot(graph: OrienteeringGraph):
     # edge_labels = {(n1, n2): f"{w['weight']:.1f}" for n1, n2, w in G.edges(data=True)}
     # nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, ax=ax)
 
-    ax.margins(0)  # No margins around the graph
+    ax.margins(0)
 
     # Make sure the plot fills the entire window
     plt.tight_layout()
@@ -69,7 +69,7 @@ def update_plot(ax, G, pos, parent_idx, child_idx):
     ax.clear()
     nx.draw(G, pos, ax=ax, with_labels=True, node_color='lightblue', node_size=500, edge_color='blue')
     plt.draw()
-    plt.pause(0.0000001)  # Small pause to allow the plot to update
+    plt.pause(0.0000001) 
 
 def plot_final_path(ax, G, pos, graph: OrienteeringGraph, path, filename):
     red_edges = []
@@ -100,7 +100,7 @@ def plot_rewards(rewards_log, filename, step=1000):
     plt.xlabel("Number of Rollouts")
     plt.ylabel("Reward")
     plt.title("Reward over Rollouts")
-    plt.ylim(bottom=0)  # Start y-axis from zero
+    plt.ylim(bottom=0)
     plt.xlim(left=0)
     plt.grid(True)
     plt.savefig(filename)
@@ -114,7 +114,6 @@ def plot_rewards_average(thread_rewards, averaged_rewards, filename, step=1000):
 
     colors = ['red', 'green', 'orange', 'purple']
     for index, rewards in enumerate(thread_rewards):
-        # Sample rewards for current thread
         sampled_rewards = rewards[::step]
         plt.plot(sampled_iterations, sampled_rewards, color=colors[index], linestyle="-", markersize=4, linewidth=1, label=f'Thread {index + 1}')
 
@@ -124,7 +123,7 @@ def plot_rewards_average(thread_rewards, averaged_rewards, filename, step=1000):
     plt.xlabel("Simulation Iterations")
     plt.ylabel("Reward")
     plt.title("Reward over Iterations")
-    plt.ylim(bottom=0)  # Start y-axis from zero
+    plt.ylim(bottom=0) 
     plt.xlim(left=0)
     plt.grid(True)
     plt.legend()
@@ -151,7 +150,37 @@ def plot_rewards_parallel(thread_rewards, filename, step=1000):
     plt.xlabel("Number of Rollouts")
     plt.ylabel("Reward")
     plt.title("Reward over Rollouts")
-    plt.ylim(bottom=0)  # Start y-axis from zero
+    plt.ylim(bottom=0) 
+    plt.xlim(left=0)
+    plt.grid(True)
+    plt.savefig(filename)
+    plt.show()
+
+def plot_rewards_time(time_log, rewards_log, filename, step=1000):
+    sampled_rewards = rewards_log[::step]
+    sampled_times = time_log[::step]
+    
+    plt.figure()
+    plt.plot(sampled_times, sampled_rewards, color="green", linestyle="-", markersize=4, linewidth=1)
+    plt.xlabel("Time (s)")
+    plt.ylabel("Reward")
+    plt.title("Reward over Time")
+    plt.ylim(bottom=0)
+    plt.xlim(left=0)
+    plt.grid(True)
+    plt.savefig(filename)
+    plt.show()
+
+def plot_rewards_time_parallel(time_log, rewards_log, filename, step=1000):
+    sampled_rewards = rewards_log[::step]
+    sampled_times = time_log[::step]
+
+    plt.figure()
+    plt.plot(sampled_times, sampled_rewards, color="green", linestyle="-", markersize=4, linewidth=1)
+    plt.xlabel("Time (s)")
+    plt.ylabel("Reward")
+    plt.title("Reward over Time")
+    plt.ylim(bottom=0)
     plt.xlim(left=0)
     plt.grid(True)
     plt.savefig(filename)
